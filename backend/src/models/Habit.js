@@ -2,23 +2,20 @@ const mongoose = require("mongoose");
 
 const habitSchema = new mongoose.Schema(
   {
-    userId: {
+    user: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
     title: {
       type: String,
       required: true,
       trim: true,
     },
-
     completedDates: {
       type: [String], // YYYY-MM-DD
       default: [],
     },
-
     isDeleted: {
       type: Boolean,
       default: false,

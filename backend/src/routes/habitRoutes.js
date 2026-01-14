@@ -5,10 +5,12 @@ const {
   toggleHabitToday,
   deleteHabit,
 } = require("../controllers/habitController");
+
 const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 
+// 🔐 protect all habit routes
 router.use(protect);
 
 router.post("/", createHabit);

@@ -1,17 +1,16 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
 });
 
-// 🔐 Attach token ONLY if it exists AND route is protected
+// 🔐 Attach JWT token if available
 API.interceptors.request.use((config) => {
   const user = localStorage.getItem("user");
 
-  // ❌ Do NOT attach token for auth routes
   if (
     user &&
     !config.url.includes("/auth/login") &&

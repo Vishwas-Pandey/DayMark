@@ -1,20 +1,20 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL:
+    import.meta.env.MODE === "development"
+      ? "http://localhost:5001/api"
+      : "https://daymark.onrender.com", // 🔴 CHANGE THIS
   headers: {
     "Content-Type": "application/json",
   },
 });
 
+// Attach JWT token
 API.interceptors.request.use((config) => {
   const user = localStorage.getItem("user");
 
-  if (
-    user &&
-    !config.url.includes("/auth/login") &&
-    !config.url.includes("/auth/register")
-  ) {
+  if (user) {
     const parsed = JSON.parse(user);
     if (parsed?.token) {
       config.headers.Authorization = `Bearer ${parsed.token}`;

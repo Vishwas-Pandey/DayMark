@@ -8,17 +8,15 @@ const habitRoutes = require("./routes/habitRoutes");
 
 const app = express();
 
-// =======================
-// CORS (PRODUCTION SAFE)
-// =======================
+/**
+ * ✅ CORS FIX (IMPORTANT)
+ */
 app.use(
   cors({
     origin: [
-      "http://localhost:5173",
+      "https://day-mark-ec3y.vercel.app", // production frontend
+      "http://localhost:5173", // local dev
       "http://localhost:3000",
-      "day-mark-ec3y.vercel.app",
-      "day-mark-ec3y-git-main-vishwas-pandeys-projects.vercel.app",
-      "day-mark-ec3y-k7upwylnf-vishwas-pandeys-projects.vercel.app", // ✅ your Vercel domain
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -26,32 +24,29 @@ app.use(
   })
 );
 
-// =======================
-// BODY PARSERS
-// =======================
+// Handle preflight explicitly
+app.options("*", cors());
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// =======================
-// DEBUG LOGGER (DEV ONLY)
-// =======================
-if (process.env.NODE_ENV !== "production") {
-  app.use((req, res, next) => {
-    console.log(`📡 [${req.method}] ${req.url}`);
-    next();
-  });
-}
+// Debug logger
+app.use((req, res, next) => {
+  console.log(`📡 [${req.method}] ${req.url}`);
+  next();
+});
 
-// =======================
-// ROUTES
-// =======================
+// Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
-app.use("/api/habit", habitRoutes); // ✅ SINGULAR (matches frontend)
+app.use("/api/habits", habitRoutes);
 
-// =======================
-// GLOBAL ERROR HANDLER
-// =======================
+// Health check (VERY useful)
+app.get("/", (req, res) => {
+  res.json({ status: "DayMark backend running ✅" });
+});
+
+// Global error handler
 app.use((err, req, res, next) => {
   console.error("🔥 GLOBAL ERROR:", err.stack);
   res.status(500).json({

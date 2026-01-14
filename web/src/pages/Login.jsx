@@ -5,37 +5,69 @@ import { useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
   });
+
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     const endpoint = isRegister ? "/auth/register" : "/auth/login";
 
+    // ✅ Send only required fields
+    const payload = isRegister
+      ? {
+          name: formData.name,
+          email: formData.email,
+          password: formData.password,
+        }
+      : {
+          email: formData.email,
+          password: formData.password,
+        };
+
     try {
-      const { data } = await API.post(endpoint, formData);
+      const { data } = await API.post(endpoint, payload);
+
       localStorage.setItem("user", JSON.stringify(data));
-      toast.success(`Welcome, ${data.name}!`);
-      // Use a small timeout so the user sees the success message before redirecting
+      toast.success(`Welcome, ${data.name || "back"}!`);
+
+      // ✅ SPA-safe navigation
       setTimeout(() => {
-        window.location.href = "/dashboard";
-      }, 1000);
+        navigate("/dashboard");
+      }, 800);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Something went wrong");
+      console.error(err);
+      toast.error(err.response?.data?.message || "Authentication failed");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const toggleMode = () => {
+    setIsRegister(!isRegister);
+    setFormData({
+      name: "",
+      email: "",
+      password: "",
+    });
   };
 
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <Toaster position="top-center" />
+
       <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-gray-100">
         <h2 className="mb-2 text-center text-3xl font-bold text-gray-900">
           DayMark
         </h2>
+
         <p className="mb-8 text-center text-gray-500">
           {isRegister
             ? "Start your consistency journey"
@@ -80,15 +112,20 @@ const Login = () => {
 
           <button
             type="submit"
-            className="w-full rounded-lg bg-black p-3 font-bold text-white hover:bg-gray-800 transition-colors"
+            disabled={loading}
+            className="w-full rounded-lg bg-black p-3 font-bold text-white hover:bg-gray-800 transition-colors disabled:opacity-70"
           >
-            {isRegister ? "Create Account" : "Log In"}
+            {loading
+              ? "Please wait..."
+              : isRegister
+              ? "Create Account"
+              : "Log In"}
           </button>
         </form>
 
         <div className="mt-6 text-center text-sm">
           <button
-            onClick={() => setIsRegister(!isRegister)}
+            onClick={toggleMode}
             className="text-gray-500 hover:text-black hover:underline"
           >
             {isRegister

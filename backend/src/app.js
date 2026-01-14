@@ -16,7 +16,9 @@ app.use(
     origin: [
       "http://localhost:5173",
       "http://localhost:3000",
-      "https://day-mark-five.vercel.app", // ✅ your Vercel domain
+      "day-mark-ec3y.vercel.app",
+      "day-mark-ec3y-git-main-vishwas-pandeys-projects.vercel.app",
+      "day-mark-ec3y-k7upwylnf-vishwas-pandeys-projects.vercel.app", // ✅ your Vercel domain
     ],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],

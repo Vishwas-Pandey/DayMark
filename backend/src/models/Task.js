@@ -12,6 +12,12 @@ const taskSchema = mongoose.Schema(
       required: [true, "Please add a task title"],
       trim: true,
     },
+    // 👇 NEW FIELD: Distinguishes Habits from Tasks
+    type: {
+      type: String,
+      enum: ["task", "habit"],
+      default: "task",
+    },
     category: {
       type: String,
       enum: ["Work", "Personal", "Health", "Study", "No Category"],
@@ -36,7 +42,7 @@ const taskSchema = mongoose.Schema(
     },
     isDeleted: {
       type: Boolean,
-      default: false, // This enables the "Undo" feature
+      default: false,
     },
   },
   {

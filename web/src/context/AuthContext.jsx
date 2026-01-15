@@ -1,33 +1,33 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); // ONLY hydration loading
 
   useEffect(() => {
-    // Check for logged-in user when the app starts
     const storedUser = localStorage.getItem("user");
     if (storedUser) {
       setUser(JSON.parse(storedUser));
     }
-    setLoading(false);
+    setLoading(false); // 👈 hydration done
   }, []);
 
   const login = (userData) => {
     localStorage.setItem("user", JSON.stringify(userData));
-    setUser(userData); // ⚡ Updates state immediately
+    setUser(userData);
+    // ❌ DO NOT touch loading here
   };
 
   const logout = () => {
     localStorage.removeItem("user");
-    setUser(null); // ⚡ Updates state immediately
+    setUser(null);
   };
 
   return (
     <AuthContext.Provider value={{ user, login, logout, loading }}>
-      {!loading && children}
+      {children}
     </AuthContext.Provider>
   );
 };

@@ -16,14 +16,8 @@ import Layout from "./components/Layout";
 const AppRoutes = () => {
   const { user, loading } = useAuth();
 
-  // ⛔ VERY IMPORTANT: wait for auth hydration
-  if (loading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <p className="text-gray-500">Loading...</p>
-      </div>
-    );
-  }
+  // ⏳ Wait for hydration BUT do not block navigation
+  if (loading) return null;
 
   return (
     <Routes>

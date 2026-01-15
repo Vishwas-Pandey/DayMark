@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
-// Removed useNavigate because we are using hard redirect now
+import { useNavigate } from "react-router-dom"; // ✅ Import navigation hook
+import { useAuth } from "../context/AuthContext"; // ✅ Import Auth hook
 
 const Login = () => {
+  const navigate = useNavigate();
+  const { login } = useAuth(); // Get the login function from Context
+
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -18,7 +22,6 @@ const Login = () => {
 
     const endpoint = isRegister ? "/auth/register" : "/auth/login";
 
-    // ✅ Send only required fields
     const payload = isRegister
       ? {
           name: formData.name,
@@ -33,15 +36,16 @@ const Login = () => {
     try {
       const { data } = await API.post(endpoint, payload);
 
-      // Save user to storage
-      localStorage.setItem("user", JSON.stringify(data));
+      // ✅ 1. Update Global State (Context)
+      // This tells App.js "User is logged in" instantly.
+      // It also handles localStorage.setItem internally in the Context.
+      login(data);
 
       toast.success(`Welcome, ${data.name || "back"}!`);
 
-      // 🚨 FORCE REDIRECT: This guarantees the page changes immediately.
-      // We removed the timeout and use native browser redirection to ensure
-      // the app reloads with the new auth state.
-      window.location.href = "/dashboard";
+      // ✅ 2. Soft Redirect
+      // React Router handles this instantly without reloading the browser.
+      navigate("/dashboard");
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Authentication failed");

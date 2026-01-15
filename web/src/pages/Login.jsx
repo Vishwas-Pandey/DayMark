@@ -47,14 +47,13 @@ const Login = () => {
     try {
       const { data } = await API.post(endpoint, payload);
 
-      // ✅ Login successful
       login(data);
       toast.success(`Welcome, ${data.name || "back"}!`);
       // No navigate needed; useEffect handles it.
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Authentication failed");
-      submittingRef.current = false; // Reset lock on failure
+      submittingRef.current = false;
     } finally {
       setLoading(false);
     }
@@ -66,11 +65,18 @@ const Login = () => {
   };
 
   return (
-    // ✨ This Layout matches your "Working" screenshot exactly
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <Toaster position="top-center" />
 
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-gray-100">
+      <div
+        className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-gray-100"
+        // 🔒 FORCE STYLE: Ensures the card looks right even if CSS fails
+        style={{
+          backgroundColor: "white",
+          borderColor: "#e5e7eb",
+          borderWidth: "1px",
+        }}
+      >
         <h2 className="mb-2 text-center text-3xl font-bold text-gray-900">
           DayMark
         </h2>
@@ -120,7 +126,9 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-black p-3 font-bold text-white hover:bg-gray-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full rounded-lg p-3 font-bold text-white hover:bg-gray-800 transition-colors disabled:opacity-70 disabled:cursor-not-allowed"
+            // 🔒 FORCE STYLE: This guarantees the button is black
+            style={{ backgroundColor: "black", color: "white" }}
           >
             {loading
               ? "Please wait..."

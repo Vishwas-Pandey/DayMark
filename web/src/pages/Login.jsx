@@ -8,7 +8,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { login, user } = useAuth();
 
-  // 🛑 Logic: Ref to prevent double submission
+  // 🛑 Prevents double-clicking
   const submittingRef = useRef(false);
 
   const [isRegister, setIsRegister] = useState(false);
@@ -19,7 +19,7 @@ const Login = () => {
     password: "",
   });
 
-  // ✅ Logic: Auto-redirect if user is already logged in
+  // ✅ Auto-redirect if already logged in
   useEffect(() => {
     if (user) {
       navigate("/dashboard");
@@ -29,59 +29,44 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 🛑 Logic: Hard Stop if already submitting
     if (submittingRef.current) return;
     submittingRef.current = true;
-
     setLoading(true);
 
     const endpoint = isRegister ? "/auth/register" : "/auth/login";
 
-    // Prepare payload based on mode
+    // Payload logic
     const payload = isRegister
       ? {
           name: formData.name,
           email: formData.email,
           password: formData.password,
         }
-      : {
-          email: formData.email,
-          password: formData.password,
-        };
+      : { email: formData.email, password: formData.password };
 
     try {
       const { data } = await API.post(endpoint, payload);
 
-      // ✅ Logic: Update Context (App.js will react to this)
+      // ✅ Login successful
       login(data);
-
       toast.success(`Welcome, ${data.name || "back"}!`);
-
-      // Note: We don't need manual navigation here because the
-      // useEffect above will trigger as soon as 'login(data)' updates the user state.
+      // No navigate needed; useEffect handles it.
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Authentication failed");
-      // Reset ref so they can try again if it failed
-      submittingRef.current = false;
+      submittingRef.current = false; // Reset lock on failure
     } finally {
       setLoading(false);
-      // We don't reset submittingRef to false on success immediately
-      // to prevent clicking while the page transitions.
     }
   };
 
   const toggleMode = () => {
     setIsRegister(!isRegister);
-    setFormData({
-      name: "",
-      email: "",
-      password: "",
-    });
+    setFormData({ name: "", email: "", password: "" });
   };
 
-  // 👇 VISUALS: This is the exact design you wanted
   return (
+    // ✨ This Layout matches your "Working" screenshot exactly
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <Toaster position="top-center" />
 

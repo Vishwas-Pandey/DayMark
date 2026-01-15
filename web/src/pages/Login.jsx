@@ -1,12 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
-  const navigate = useNavigate();
-  const { login, user } = useAuth(); // 👈 get user also
+  const { login } = useAuth();
+  const submittingRef = useRef(false); // 🛑 prevents double submit
 
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -16,43 +15,29 @@ const Login = () => {
     password: "",
   });
 
-  // ✅ Auto redirect if already logged in
-  useEffect(() => {
-    if (user) {
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (submittingRef.current) return; // 🚫 HARD STOP
+    submittingRef.current = true;
+
     setLoading(true);
 
     const endpoint = isRegister ? "/auth/register" : "/auth/login";
 
     const payload = isRegister
-      ? {
-          name: formData.name,
-          email: formData.email,
-          password: formData.password,
-        }
-      : {
-          email: formData.email,
-          password: formData.password,
-        };
+      ? formData
+      : { email: formData.email, password: formData.password };
 
     try {
       const { data } = await API.post(endpoint, payload);
 
-      // ✅ Set auth state + localStorage
-      login(data);
-
+      login(data); // ✅ SINGLE SOURCE OF TRUTH
       toast.success(`Welcome, ${data.name || "back"}!`);
-
-      // Navigation will also happen via useEffect
-      navigate("/dashboard");
+      // ❌ NO navigate here
     } catch (err) {
-      console.error(err);
       toast.error(err.response?.data?.message || "Authentication failed");
+      submittingRef.current = false;
     } finally {
       setLoading(false);
     }
@@ -67,15 +52,11 @@ const Login = () => {
     <div className="flex h-screen items-center justify-center bg-gray-50">
       <Toaster position="top-center" />
 
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl border border-gray-100">
-        <h2 className="mb-2 text-center text-3xl font-bold text-gray-900">
-          DayMark
-        </h2>
+      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-xl border">
+        <h2 className="mb-2 text-center text-3xl font-bold">DayMark</h2>
 
         <p className="mb-8 text-center text-gray-500">
-          {isRegister
-            ? "Start your consistency journey"
-            : "Welcome back to your plan"}
+          {isRegister ? "Start your journey" : "Welcome back"}
         </p>
 
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -83,7 +64,6 @@ const Login = () => {
             <input
               type="text"
               placeholder="Full Name"
-              className="w-full rounded-lg border border-gray-300 p-3"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -95,7 +75,6 @@ const Login = () => {
           <input
             type="email"
             placeholder="Email Address"
-            className="w-full rounded-lg border border-gray-300 p-3"
             value={formData.email}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
@@ -106,7 +85,6 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            className="w-full rounded-lg border border-gray-300 p-3"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
@@ -114,29 +92,16 @@ const Login = () => {
             required
           />
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full rounded-lg bg-black p-3 font-bold text-white disabled:opacity-70"
-          >
-            {loading
-              ? "Please wait..."
-              : isRegister
-              ? "Create Account"
-              : "Log In"}
+          <button type="submit" disabled={loading}>
+            {loading ? "Please wait..." : isRegister ? "Register" : "Log In"}
           </button>
         </form>
 
-        <div className="mt-6 text-center text-sm">
-          <button
-            onClick={toggleMode}
-            className="text-gray-500 hover:text-black hover:underline"
-          >
-            {isRegister
-              ? "Already have an account? Log In"
-              : "New here? Create Account"}
-          </button>
-        </div>
+        <button onClick={toggleMode} className="mt-4 text-sm text-gray-500">
+          {isRegister
+            ? "Already have an account? Log in"
+            : "New here? Create account"}
+        </button>
       </div>
     </div>
   );

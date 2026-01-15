@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
+// Removed useNavigate because we are using hard redirect now
 
 const Login = () => {
   const [isRegister, setIsRegister] = useState(false);
@@ -11,8 +11,6 @@ const Login = () => {
     email: "",
     password: "",
   });
-
-  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -35,13 +33,15 @@ const Login = () => {
     try {
       const { data } = await API.post(endpoint, payload);
 
+      // Save user to storage
       localStorage.setItem("user", JSON.stringify(data));
+
       toast.success(`Welcome, ${data.name || "back"}!`);
 
-      // ✅ SPA-safe navigation
-      setTimeout(() => {
-        navigate("/dashboard");
-      }, 800);
+      // 🚨 FORCE REDIRECT: This guarantees the page changes immediately.
+      // We removed the timeout and use native browser redirection to ensure
+      // the app reloads with the new auth state.
+      window.location.href = "/dashboard";
     } catch (err) {
       console.error(err);
       toast.error(err.response?.data?.message || "Authentication failed");

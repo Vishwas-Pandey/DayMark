@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import toast, { Toaster } from "react-hot-toast";
-import { useNavigate } from "react-router-dom"; // ✅ Import navigation hook
-import { useAuth } from "../context/AuthContext"; // ✅ Import Auth hook
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Get the login function from Context
+  const { login, user } = useAuth(); // 👈 get user also
 
   const [isRegister, setIsRegister] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -15,6 +15,13 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  // ✅ Auto redirect if already logged in
+  useEffect(() => {
+    if (user) {
+      navigate("/dashboard");
+    }
+  }, [user, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -36,15 +43,12 @@ const Login = () => {
     try {
       const { data } = await API.post(endpoint, payload);
 
-      // ✅ 1. Update Global State (Context)
-      // This tells App.js "User is logged in" instantly.
-      // It also handles localStorage.setItem internally in the Context.
+      // ✅ Set auth state + localStorage
       login(data);
 
       toast.success(`Welcome, ${data.name || "back"}!`);
 
-      // ✅ 2. Soft Redirect
-      // React Router handles this instantly without reloading the browser.
+      // Navigation will also happen via useEffect
       navigate("/dashboard");
     } catch (err) {
       console.error(err);
@@ -56,11 +60,7 @@ const Login = () => {
 
   const toggleMode = () => {
     setIsRegister(!isRegister);
-    setFormData({
-      name: "",
-      email: "",
-      password: "",
-    });
+    setFormData({ name: "", email: "", password: "" });
   };
 
   return (
@@ -83,7 +83,7 @@ const Login = () => {
             <input
               type="text"
               placeholder="Full Name"
-              className="w-full rounded-lg border border-gray-300 p-3 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-full rounded-lg border border-gray-300 p-3"
               value={formData.name}
               onChange={(e) =>
                 setFormData({ ...formData, name: e.target.value })
@@ -95,7 +95,7 @@ const Login = () => {
           <input
             type="email"
             placeholder="Email Address"
-            className="w-full rounded-lg border border-gray-300 p-3 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 p-3"
             value={formData.email}
             onChange={(e) =>
               setFormData({ ...formData, email: e.target.value })
@@ -106,7 +106,7 @@ const Login = () => {
           <input
             type="password"
             placeholder="Password"
-            className="w-full rounded-lg border border-gray-300 p-3 focus:border-black focus:outline-none focus:ring-1 focus:ring-black"
+            className="w-full rounded-lg border border-gray-300 p-3"
             value={formData.password}
             onChange={(e) =>
               setFormData({ ...formData, password: e.target.value })
@@ -117,7 +117,7 @@ const Login = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-black p-3 font-bold text-white hover:bg-gray-800 transition-colors disabled:opacity-70"
+            className="w-full rounded-lg bg-black p-3 font-bold text-white disabled:opacity-70"
           >
             {loading
               ? "Please wait..."

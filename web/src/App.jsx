@@ -5,16 +5,25 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import { AuthProvider, useAuth } from "./context/AuthContext"; // Import context
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import AllTasks from "./pages/AllTasks";
 import Overdue from "./pages/Overdue";
 import Layout from "./components/Layout";
 
-// Separate component for Routes to access useAuth()
+// Routes separated so we can use AuthContext
 const AppRoutes = () => {
-  const { user } = useAuth(); // ⚡ Now this is reactive!
+  const { user, loading } = useAuth();
+
+  // ⛔ VERY IMPORTANT: wait for auth hydration
+  if (loading) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <Routes>

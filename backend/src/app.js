@@ -1,57 +1,60 @@
-const express = require("express");
-const cors = require("cors");
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import compression from 'compression';
+import hpp from 'hpp';
+import rateLimit from 'express-rate-limit';
+import cookieParser from 'cookie-parser';
 
-// Routes
-const authRoutes = require("./routes/authRoutes");
-const taskRoutes = require("./routes/taskRoutes");
-const habitRoutes = require("./routes/habitRoutes");
+import { env } from './config/env.js';
+import { corsConfig } from './config/cors.js';
+import { helmetConfig } from './config/helmet.js';
+import { requestContextMiddleware } from './common/middlewares/requestContext.middleware.js';
+import { requestLogger } from './common/middlewares/requestLogger.middleware.js';
+import { errorMiddleware } from './common/middlewares/error.middleware.js';
+import { notFoundMiddleware } from './common/middlewares/notFound.middleware.js';
+import { mongoSanitize } from './common/middlewares/mongoSanitize.middleware.js';
+import v1Routes from './api/v1/index.js';
 
 const app = express();
 
-/**
- * ✅ CORS FIX (IMPORTANT)
- */
-app.use(
-  cors({
-    origin: [
-      "https://day-mark-ec3y.vercel.app", // production frontend
-      "http://localhost:5173", // local dev
-      "http://localhost:3000",
-    ],
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
-  })
-);
+// Security Middlewares
+app.use(helmet(helmetConfig));
+app.use(cors(corsConfig));
+app.use(compression());
+app.use(express.json({ limit: '10kb' }));
+app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+app.use(cookieParser());
+app.use(mongoSanitize);
+app.use(hpp());
 
-// Handle preflight explicitly
-app.options("*", cors());
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: 'Too many requests from this IP, please try again in 15 minutes',
+});
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api', limiter);
+}
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-// Debug logger
 app.use((req, res, next) => {
-  console.log(`📡 [${req.method}] ${req.url}`);
-  next();
+    console.log(
+        `[${new Date().toISOString()}]`,
+        req.method,
+        req.originalUrl
+    );
+    next();
 });
 
-// Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/habits", habitRoutes);
+// Context & Logging
+app.use(requestContextMiddleware);
+app.use(requestLogger);
 
-// Health check (VERY useful)
-app.get("/", (req, res) => {
-  res.json({ status: "DayMark backend running ✅" });
-});
+// API Routes
+app.use('/api/v1', v1Routes);
 
-// Global error handler
-app.use((err, req, res, next) => {
-  console.error("🔥 GLOBAL ERROR:", err.stack);
-  res.status(500).json({
-    message: err.message || "Server Error",
-  });
-});
+// 404 & Global Error Handler
+app.use(notFoundMiddleware);
+app.use(errorMiddleware);
 
-module.exports = app;
+export default app;

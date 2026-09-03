@@ -27,20 +27,20 @@ const ConsistencyRing = ({ tasks, size = "large" }) => {
     <div
       className={`flex items-center ${
         size === "large"
-          ? "justify-between bg-white p-6 rounded-3xl border border-gray-100 shadow-sm"
+          ? "justify-between bg-surface-primary p-6 rounded-3xl border border-border-default shadow-sm"
           : "gap-4"
       }`}
     >
       {/* Text is only visible in Large Mode (Dashboard) */}
       {size === "large" && (
         <div>
-          <h3 className="text-gray-500 font-bold text-sm uppercase tracking-wider">
+          <h3 className="text-text-muted font-bold text-sm uppercase tracking-wider">
             Consistency
           </h3>
-          <p className="text-3xl font-black text-gray-900 mt-1">
+          <p className="text-3xl font-black text-text-heading mt-1">
             {percentage}%
           </p>
-          <p className="text-xs text-gray-400 font-medium mt-1">
+          <p className="text-xs text-text-muted font-medium mt-1">
             {completed} done • {overdue} missed
           </p>
         </div>

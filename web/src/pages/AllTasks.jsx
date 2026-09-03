@@ -1,171 +1,116 @@
-import React, { useState, useEffect } from "react";
-import API from "../services/api";
-import Modal from "../components/common/Modal";
-import TaskForm from "../components/TaskForm";
-import { ListTodo, Check, X, Plus } from "lucide-react";
+import React, { useState } from 'react';
+import { ErrorBoundary } from '../components/common/ErrorBoundary';
+import { useTasks } from '../hooks/useTasks';
+import { TaskHeader } from '../features/tasks/components/TaskHeader';
+import { TaskFilterBar } from '../features/tasks/components/TaskFilterBar';
+import { TaskList } from '../features/tasks/components/TaskList';
+import { TaskDetailDrawer } from '../features/tasks/components/TaskDetailDrawer';
+import Modal from '../components/common/Modal';
+import TaskForm from '../components/TaskForm';
 
-const AllTasks = () => {
-  const [habits, setHabits] = useState([]);
-  const [habitGrid, setHabitGrid] = useState({});
-  const [dateHeaders, setDateHeaders] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
+export const AllTasks = () => {
+  const { data: tasks, isLoading, error, updateTask, deleteTask, refetch, bulkCompleteTasks, bulkDeleteTasks } = useTasks();
+  const [filter, setFilter] = useState('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedTask, setSelectedTask] = useState(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState([]);
 
-  useEffect(() => {
-    const dates = [...Array(7)]
-      .map((_, i) => {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        return {
-          obj: d,
-          str: d.toISOString().split("T")[0],
-        };
-      })
-      .reverse();
+  // Filter logic
+  const filteredTasks = tasks?.filter(task => {
+    // Search
+    if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+    
+    // Quick Filters
+    if (filter === 'completed') return task.status === 'completed';
+    if (filter === 'today') {
+      const isToday = new Date(task.dueDate).toDateString() === new Date().toDateString();
+      return isToday && task.status !== 'completed';
+    }
+    if (filter === 'overdue') {
+      const isOverdue = new Date(task.dueDate) < new Date();
+      return isOverdue && task.status !== 'completed';
+    }
+    return true; // 'all' or fallback
+  }) || [];
 
-    setDateHeaders(dates);
-    fetchHabits(dates);
-  }, []);
+  const handleToggleTask = (task) => {
+    updateTask.mutate({ 
+      id: task.id, 
+      data: { status: task.status === 'completed' ? 'todo' : 'completed' } 
+    });
+  };
 
-  const fetchHabits = async (dates = dateHeaders) => {
-    try {
-      const { data } = await API.get("/habits");
-      setHabits(data);
-      processHabitData(data, dates);
-    } catch (error) {
-      console.error("Failed to fetch habits", error);
+  const handleSelectTaskCheckbox = (id) => {
+    setSelectedIds(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
+  };
+
+  const handleDelete = (id) => {
+    if (window.confirm("Are you sure you want to delete this task?")) {
+      deleteTask.mutate(id);
+      setSelectedTask(null);
     }
   };
 
-  const processHabitData = (habits, dates) => {
-    const grid = {};
-    const today = new Date().toISOString().split("T")[0];
-
-    habits.forEach((habit) => {
-      grid[habit.title] = {};
-
-      dates.forEach(({ str }) => {
-        if (habit.completedDates.includes(str)) {
-          grid[habit.title][str] = "completed";
-        } else if (str < today) {
-          grid[habit.title][str] = "overdue";
-        } else {
-          grid[habit.title][str] = "pending";
-        }
-      });
-    });
-
-    setHabitGrid(grid);
+  const handleBulkComplete = () => {
+    bulkCompleteTasks.mutate(selectedIds, { onSuccess: () => setSelectedIds([]) });
   };
 
-  const getStatusForDay = (habitName, dateStr) => {
-    return habitGrid[habitName]?.[dateStr] || "none";
+  const handleBulkDelete = () => {
+    if (window.confirm(`Delete ${selectedIds.length} selected task(s)?`)) {
+      bulkDeleteTasks.mutate(selectedIds, { onSuccess: () => setSelectedIds([]) });
+    }
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6">
-      <div className="flex justify-between items-center mb-8">
-        <div className="flex items-center gap-3">
-          <div className="p-3 bg-black text-white rounded-xl">
-            <ListTodo size={24} />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Habit Tracker</h2>
-            <p className="text-gray-500">
-              Your visual history for the last 7 days.
-            </p>
-          </div>
-        </div>
-
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 bg-black text-white px-5 py-2.5 rounded-xl font-bold hover:bg-gray-800 transition shadow-lg"
-        >
-          <Plus size={20} />
-          Add Habit
-        </button>
-      </div>
-
-      <div className="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
-        {/* Header */}
-        <div className="grid grid-cols-[200px_1fr] border-b border-gray-100 bg-gray-50/50">
-          <div className="p-4 font-bold text-gray-400 uppercase text-xs">
-            Habit Name
-          </div>
-          <div className="grid grid-cols-7">
-            {dateHeaders.map((item, i) => (
-              <div key={i} className="p-4 text-center border-l border-gray-100">
-                <p className="text-xs font-bold text-gray-400 uppercase mb-1">
-                  {item.obj.toLocaleDateString("en-US", { weekday: "short" })}
-                </p>
-                <p
-                  className={`text-sm font-bold ${
-                    i === 6
-                      ? "text-blue-600 bg-blue-50 rounded-full w-6 h-6 mx-auto flex items-center justify-center"
-                      : "text-gray-900"
-                  }`}
-                >
-                  {item.obj.getDate()}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Rows */}
-        {Object.keys(habitGrid).length === 0 ? (
-          <div className="p-12 text-center text-gray-400">
-            No habits tracked yet. Click "Add Habit" to start!
-          </div>
-        ) : (
-          Object.keys(habitGrid).map((habitName) => (
-            <div
-              key={habitName}
-              className="grid grid-cols-[200px_1fr] border-b border-gray-100 hover:bg-gray-50"
-            >
-              <div className="p-4 font-bold text-gray-800 truncate">
-                {habitName}
-              </div>
-              <div className="grid grid-cols-7">
-                {dateHeaders.map((item, i) => {
-                  const status = getStatusForDay(habitName, item.str);
-                  return (
-                    <div
-                      key={i}
-                      className="p-2 border-l border-gray-100 flex justify-center"
-                    >
-                      {status === "completed" && (
-                        <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-white">
-                          <Check size={18} strokeWidth={4} />
-                        </div>
-                      )}
-                      {status === "overdue" && (
-                        <div className="w-8 h-8 bg-red-100 rounded-lg flex items-center justify-center text-red-500">
-                          <X size={18} strokeWidth={3} />
-                        </div>
-                      )}
-                      {status === "pending" && (
-                        <div className="w-8 h-8 border-2 border-gray-200 rounded-lg bg-gray-50"></div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        title="Start New Habit"
-      >
-        <TaskForm
-          onSuccess={() => fetchHabits()}
-          onClose={() => setIsModalOpen(false)}
-          defaultType="habit"
+    <div className="w-full max-w-6xl mx-auto pb-24 relative min-h-full flex flex-col">
+      <ErrorBoundary>
+        <TaskHeader 
+          tasks={tasks} 
+          onOpenCreate={() => setIsCreateOpen(true)} 
+          onSearch={setSearchQuery} 
         />
+      </ErrorBoundary>
+      
+      <ErrorBoundary>
+        <TaskFilterBar currentFilter={filter} onFilterChange={setFilter} />
+      </ErrorBoundary>
+      
+      <div className="flex-1">
+        <ErrorBoundary>
+          <TaskList 
+            tasks={filteredTasks} 
+            isLoading={isLoading} 
+            error={error} 
+            onToggle={handleToggleTask}
+            onClickTask={setSelectedTask}
+            selectedIds={selectedIds}
+            onSelectTask={handleSelectTaskCheckbox}
+          />
+        </ErrorBoundary>
+      </div>
+
+      <TaskDetailDrawer 
+        task={selectedTask} 
+        isOpen={!!selectedTask} 
+        onClose={() => setSelectedTask(null)}
+        onDelete={handleDelete}
+      />
+
+      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Task">
+        <TaskForm onSuccess={() => { setIsCreateOpen(false); refetch(); }} onClose={() => setIsCreateOpen(false)} defaultType="task" />
       </Modal>
+
+      {/* Floating Action Bar for Bulk Selection could go here */}
+      {selectedIds.length > 0 && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-text-heading text-surface-primary px-6 py-3 rounded-2xl shadow-2xl flex items-center gap-6 z-30 font-semibold animate-in slide-in-from-bottom-10">
+          <span>{selectedIds.length} Selected</span>
+          <div className="flex items-center gap-3">
+            <button onClick={handleBulkComplete} className="px-3 py-1.5 rounded-lg bg-surface-primary/10 hover:bg-surface-primary/20 transition-colors">Complete</button>
+            <button onClick={handleBulkDelete} className="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-300 hover:bg-red-500/30 transition-colors">Delete</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -1,12 +1,80 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    
+    <!-- Primary Meta Tags -->
+    <title>DayMark - The Operating System For Your Life</title>
+    <meta name="title" content="DayMark - The Operating System For Your Life" />
+    <meta name="description" content="Track habits, organize goals, understand your progress, and build consistency one day at a time with your AI-powered productivity companion." />
+    <meta name="keywords" content="productivity, habits, goals, journal, AI coach, daily planner, routine tracker" />
+    <meta name="author" content="Vishwas Pandey" />
+    <meta name="theme-color" content="#050505" />
+    <meta name="color-scheme" content="dark" />
+    
+    <!-- Canonical URL -->
+    <link rel="canonical" href="https://daymark.app/" />
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://daymark.app/" />
+    <meta property="og:title" content="DayMark - The Operating System For Your Life" />
+    <meta property="og:description" content="Track habits, organize goals, understand your progress, and build consistency one day at a time with your AI-powered productivity companion." />
+    <meta property="og:image" content="https://daymark.app/og-image.jpg" />
+    <meta property="og:site_name" content="DayMark" />
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="https://daymark.app/" />
+    <meta property="twitter:title" content="DayMark - The Operating System For Your Life" />
+    <meta property="twitter:description" content="Track habits, organize goals, understand your progress, and build consistency one day at a time with your AI-powered productivity companion." />
+    <meta property="twitter:image" content="https://daymark.app/og-image.jpg" />
+    
+    <!-- Favicons -->
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>DayMark</title>
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.json" />
+
+    <!-- Preloads -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+    <!-- JSON-LD Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "DayMark",
+      "operatingSystem": "Web",
+      "applicationCategory": "ProductivityApplication",
+      "description": "The operating system for your life. Track habits, organize goals, and build consistency.",
+      "url": "https://daymark.app",
+      "publisher": {
+        "@type": "Organization",
+        "name": "DayMark"
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+    <script>
+      (function() {
+        try {
+          var savedTheme = localStorage.getItem('daymark-theme');
+          var systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+          document.documentElement.dataset.theme = theme;
+        } catch (e) {}
+      })();
+    </script>
   </head>
-  <body>
+  <body class="bg-surface-primary text-text-heading antialiased selection:bg-interactive-primary/30 selection:text-white transition-colors duration-300">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

@@ -1,3 +1,108 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --color-surface-primary: #ffffff;
+  --color-surface-secondary: #f9fafb;
+  --color-surface-floating: #ffffff;
+  --color-surface-overlay: #f3f4f6;
+  --color-surface-glass: rgba(0, 0, 0, 0.05);
+
+  --color-interactive-primary: #4f46e5;
+  --color-interactive-secondary: #e5e7eb;
+  --color-interactive-success: #10b981;
+  --color-interactive-danger: #ef4444;
+
+  --color-text-heading: #111827;
+  --color-text-body: #374151;
+  --color-text-muted: #6b7280;
+
+  --color-border-default: rgba(0, 0, 0, 0.1);
+  --color-border-subtle: rgba(0, 0, 0, 0.06);
+  --color-border-hover: rgba(0, 0, 0, 0.2);
+  --color-border-focus: #4f46e5;
+
+  /* RGB triplets for rgba(var(--color-*-rgb), alpha) glow/tint effects */
+  --color-surface-primary-rgb: 255, 255, 255;
+  --color-surface-secondary-rgb: 249, 250, 251;
+  --color-interactive-primary-rgb: 79, 70, 229;
+  --color-border-default-rgb: 0, 0, 0;
+  --color-border-subtle-rgb: 0, 0, 0;
+}
+
+[data-theme="dark"] {
+  --color-surface-primary: #050505;
+  --color-surface-secondary: #111111;
+  --color-surface-floating: #1a1a1a;
+  --color-surface-overlay: #262626;
+  --color-surface-glass: rgba(255, 255, 255, 0.05);
+
+  --color-interactive-primary: #6366f1;
+  --color-interactive-secondary: #262626;
+  --color-interactive-success: #10b981;
+  --color-interactive-danger: #ef4444;
+
+  --color-text-heading: #ffffff;
+  --color-text-body: #d1d5db;
+  --color-text-muted: #9ca3af;
+
+  --color-border-default: rgba(255, 255, 255, 0.1);
+  --color-border-subtle: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.2);
+  --color-border-focus: #6366f1;
+
+  --color-surface-primary-rgb: 5, 5, 5;
+  --color-surface-secondary-rgb: 17, 17, 17;
+  --color-interactive-primary-rgb: 99, 102, 241;
+  --color-border-default-rgb: 255, 255, 255;
+  --color-border-subtle-rgb: 255, 255, 255;
+}
+
+body {
+  background-color: var(--color-surface-primary);
+  color: var(--color-text-heading);
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+@layer utilities {
+  .min-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .focus-ring:focus-visible {
+    outline: 2px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+
+  .glass-card {
+    backdrop-filter: blur(20px);
+    background: var(--color-surface-glass);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Base mobile improvements */
+@media (max-width: 768px) {
+  html {
+    /* Prevent text size adjustment on orientation change */
+    -webkit-text-size-adjust: 100%;
+  }
+  
+  /* Disable hover effects on touch devices to prevent sticky hover states */
+  @media (hover: none) {
+    .hover\:scale-105:hover { transform: none !important; }
+    .hover\:shadow-xl:hover { box-shadow: none !important; }
+    /* We retain active states */
+    .active\:scale-95:active { transform: scale(0.95) !important; }
+  }
+}

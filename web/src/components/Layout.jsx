@@ -5,7 +5,7 @@ import { Toaster } from "react-hot-toast";
 
 const Layout = () => {
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex min-h-[100dvh] bg-surface-secondary">
       <Toaster position="top-center" />
 
       {/* Fixed Sidebar */}

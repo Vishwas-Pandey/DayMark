@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "src/*"
+      ],
+      "@/common/*": [
+        "src/common/*"
+      ],
+      "@/modules/*": [
+        "src/modules/*"
+      ],
+      "@/config/*": [
+        "src/config/*"
+      ],
+      "@/database/*": [
+        "src/database/*"
+      ]
+    }
+  },
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
+}

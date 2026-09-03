@@ -21,13 +21,13 @@ const DailyRing = ({ tasks }) => {
   };
 
   return (
-    <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+    <div className="bg-surface-primary p-6 rounded-3xl border border-border-default shadow-sm flex items-center justify-between">
       <div>
-        <h3 className="text-gray-500 font-bold text-xs uppercase tracking-wider">
+        <h3 className="text-text-muted font-bold text-xs uppercase tracking-wider">
           Today's Progress
         </h3>
-        <p className="text-3xl font-black text-gray-900 mt-1">{percentage}%</p>
-        <p className="text-xs text-gray-400 font-medium mt-1">
+        <p className="text-3xl font-black text-text-heading mt-1">{percentage}%</p>
+        <p className="text-xs text-text-muted font-medium mt-1">
           {completed} of {total} tasks done
         </p>
       </div>

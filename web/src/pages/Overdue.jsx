@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import API from "../services/api";
+import API from "../api/axios";
 import { AlertTriangle, Calendar } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -12,14 +12,17 @@ const Overdue = () => {
 
   const fetchOverdue = () => {
     API.get("/tasks").then(({ data }) => {
-      // Only show tasks that are actually overdue
-      setTasks(data.filter((t) => t.status === "overdue"));
+      // Tasks have no literal "overdue" status — it's derived from dueDate.
+      const now = new Date();
+      setTasks(
+        data.filter((t) => t.status !== "completed" && t.status !== "archived" && t.dueDate && new Date(t.dueDate) < now)
+      );
     });
   };
 
   const handleQuickComplete = async (task) => {
     try {
-      await API.put(`/tasks/${task._id}`, { status: "completed" });
+      await API.patch(`/tasks/${task.id}`, { status: "completed" });
       toast.success("Better late than never! 😅");
       fetchOverdue(); // Refresh list to remove the item
     } catch (err) {
@@ -34,7 +37,7 @@ const Overdue = () => {
           <AlertTriangle size={24} />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Missed Tasks</h2>
+          <h2 className="text-2xl font-bold text-text-heading">Missed Tasks</h2>
           <p className="text-red-500 font-medium">
             {tasks.length} tasks require attention
           </p>
@@ -44,15 +47,15 @@ const Overdue = () => {
       <div className="grid gap-3">
         {tasks.map((task) => (
           <div
-            key={task._id}
-            className="p-5 rounded-2xl border border-red-100 bg-white shadow-sm flex justify-between items-center group hover:border-red-300 transition-all"
+            key={task.id}
+            className="p-5 rounded-2xl border border-red-100 bg-surface-primary shadow-sm flex justify-between items-center group hover:border-red-300 transition-all"
           >
             <div className="flex items-center gap-4">
               <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center text-red-500 font-bold">
                 !
               </div>
               <div>
-                <h3 className="font-bold text-lg text-gray-900">
+                <h3 className="font-bold text-lg text-text-heading">
                   {task.title}
                 </h3>
                 <div className="flex items-center gap-2 text-sm text-red-500 font-bold mt-1">
@@ -72,8 +75,8 @@ const Overdue = () => {
         ))}
 
         {tasks.length === 0 && (
-          <div className="p-20 text-center bg-white rounded-3xl border border-dashed border-gray-200">
-            <p className="text-gray-400 text-lg">
+          <div className="p-20 text-center bg-surface-primary rounded-3xl border border-dashed border-border-default">
+            <p className="text-text-muted text-lg">
               No overdue tasks. You are crushing it! 🚀
             </p>
           </div>

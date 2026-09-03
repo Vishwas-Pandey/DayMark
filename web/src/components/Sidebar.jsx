@@ -1,16 +1,21 @@
 import React from "react";
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { LayoutDashboard, ListTodo, AlertCircle, LogOut } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAuthContext } from "../context/AuthProvider";
 
 const Sidebar = () => {
-  const handleLogout = () => {
-    // 1. Clear Data
-    localStorage.removeItem("user");
-    // 2. Show Alert
-    toast.success("Logged out");
-    // 3. FORCE REFRESH to Login Page (Fixes the "staying on page" bug)
-    window.location.href = "/login";
+  const navigate = useNavigate();
+  const { logout } = useAuthContext();
+  
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success("Logged out");
+      navigate("/login", { replace: true });
+    } catch (error) {
+      toast.error("Logout failed");
+    }
   };
 
   const navItems = [
@@ -20,9 +25,9 @@ const Sidebar = () => {
   ];
 
   return (
-    <div className="w-64 h-screen bg-white border-r border-gray-200 flex flex-col fixed left-0 top-0 z-50">
+    <div className="w-64 h-[100dvh] bg-surface-primary border-r border-border-default flex flex-col fixed left-0 top-0 z-50">
       <div className="p-8">
-        <h1 className="text-2xl font-black tracking-tight text-gray-900">
+        <h1 className="text-2xl font-black tracking-tight text-text-heading">
           DayMark ☀️
         </h1>
       </div>
@@ -35,8 +40,8 @@ const Sidebar = () => {
             className={({ isActive }) =>
               `flex items-center gap-3 px-4 py-3 rounded-xl transition-all font-medium ${
                 isActive
-                  ? "bg-black text-white shadow-lg shadow-gray-200"
-                  : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"
+                  ? "bg-surface-primary text-text-heading shadow-lg shadow-gray-200"
+                  : "text-text-muted hover:bg-surface-secondary hover:text-text-heading"
               }`
             }
           >
@@ -46,10 +51,10 @@ const Sidebar = () => {
         ))}
       </nav>
 
-      <div className="p-4 border-t border-gray-100">
+      <div className="p-4 border-t border-border-default">
         <button
           onClick={handleLogout}
-          className="flex items-center gap-3 px-4 py-3 w-full text-left text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
+          className="flex items-center gap-3 px-4 py-3 w-full text-left text-text-muted hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors font-medium"
         >
           <LogOut size={20} />
           Logout

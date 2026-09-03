@@ -3,7 +3,7 @@ import { Heart, Pin, Clock, BookOpen } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { moodEmoji } from '../utils/mood';
 
-export const JournalCard = ({ entry, onClick }) => {
+export const JournalCard = ({ entry, onClick, onToggleFavorite }) => {
   const isFavorite = entry.favorite ?? entry.tags?.includes('favorite');
   const isPinned = entry.pinned ?? entry.tags?.includes('pinned');
 
@@ -38,9 +38,10 @@ export const JournalCard = ({ entry, onClick }) => {
           </div>
         </div>
         
-        <button 
+        <button
           className={`p-1.5 rounded-full transition-colors ${isFavorite ? 'text-pink-500 bg-pink-50' : 'text-text-muted hover:bg-surface-secondary'}`}
-          onClick={(e) => e.stopPropagation()}
+          onClick={(e) => { e.stopPropagation(); onToggleFavorite(entry.id, !isFavorite); }}
+          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
         >
           <Heart size={18} className={isFavorite ? 'fill-pink-500' : ''} />
         </button>

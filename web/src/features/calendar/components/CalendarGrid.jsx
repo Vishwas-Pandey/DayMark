@@ -1,8 +1,8 @@
 import React from 'react';
 import { EventCard } from './EventCard';
 
-export const CalendarGrid = ({ events, view, currentDate, onClickEvent }) => {
-  // Simplified grid scaffolding simulating a Day view timeline
+export const CalendarGrid = ({ events, currentDate, onClickEvent }) => {
+  // Day-view timeline; `events` is already filtered to `currentDate` by the caller.
   const hours = Array.from({ length: 24 }, (_, i) => i);
 
   return (
@@ -26,10 +26,8 @@ export const CalendarGrid = ({ events, view, currentDate, onClickEvent }) => {
               <div key={hour} className="h-[60px] border-b border-border-default" />
             ))}
 
-            {/* Fake layout rendering for existing events */}
             <div className="absolute top-0 left-0 right-0 bottom-0 p-2 pointer-events-none">
               {events.map((event, i) => {
-                // Mock calculation for top positioning based on date string
                 const d = new Date(event.time?.start);
                 const minutesFromMidnight = d.getHours() * 60 + d.getMinutes();
                 const top = `${(minutesFromMidnight / 60) * 60}px`;

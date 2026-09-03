@@ -39,6 +39,7 @@ export const toTaskSummaryDTO = (task) => {
     status: obj.status,
     priority: obj.priority,
     dueDate: obj.dueDate,
+    completedAt: obj.completedAt,
     labels: obj.labels,
     tags: obj.tags
   };

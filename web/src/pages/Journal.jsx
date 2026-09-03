@@ -8,7 +8,7 @@ import { JournalDetailDrawer } from '../features/journal/components/JournalDetai
 import { JournalEditor } from '../features/journal/components/JournalEditor';
 
 export const Journal = () => {
-  const { data: entries, isLoading, error, deleteEntry } = useJournal();
+  const { data: entries, isLoading, error, deleteEntry, updateEntry } = useJournal();
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -19,8 +19,9 @@ export const Journal = () => {
   const filteredEntries = entries?.filter(entry => {
     if (searchQuery && !entry.title?.toLowerCase().includes(searchQuery.toLowerCase()) && !entry.content?.toLowerCase().includes(searchQuery.toLowerCase())) return false;
     
-    if (filter === 'favorites') return entry.tags?.includes('favorite');
-    if (filter === 'pinned') return entry.tags?.includes('pinned');
+    if (filter === 'favorites') return entry.favorite;
+    if (filter === 'pinned') return entry.pinned;
+    if (filter === 'recent') return (new Date() - new Date(entry.createdAt)) < 7 * 24 * 60 * 60 * 1000;
     
     return true; 
   }).sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt)) || []; // Sort newest first
@@ -30,6 +31,10 @@ export const Journal = () => {
       deleteEntry.mutate(id);
       setSelectedEntry(null);
     }
+  };
+
+  const handleToggleFavorite = (id, favorite) => {
+    updateEntry.mutate({ id, data: { favorite } });
   };
 
   const openEditor = (entry = null) => {
@@ -56,11 +61,12 @@ export const Journal = () => {
       </ErrorBoundary>
       
       <ErrorBoundary>
-        <JournalFeed 
-          entries={filteredEntries} 
-          isLoading={isLoading} 
-          error={error} 
+        <JournalFeed
+          entries={filteredEntries}
+          isLoading={isLoading}
+          error={error}
           onClickEntry={setSelectedEntry}
+          onToggleFavorite={handleToggleFavorite}
         />
       </ErrorBoundary>
 
@@ -70,6 +76,7 @@ export const Journal = () => {
         onClose={() => setSelectedEntry(null)}
         onDelete={handleDelete}
         onEdit={(entry) => openEditor(entry)}
+        onToggleFavorite={handleToggleFavorite}
       />
 
       <JournalEditor 

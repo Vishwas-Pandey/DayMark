@@ -1,22 +1,61 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Calendar, Clock, Flag, Tag, Activity, Archive, Trash2 } from 'lucide-react';
+import { tasksApi } from '../../../api/tasks';
 
-export const TaskDetailDrawer = ({ task, isOpen, onClose, onDelete }) => {
-  if (!task) return null;
+const EMPTY_FORM = { title: '', description: '', priority: 'medium', dueDate: '', estimatedMinutes: 30, energy: 'medium' };
+
+export const TaskDetailDrawer = ({ task: taskSummary, isOpen, onClose, onDelete, onSave, onArchive }) => {
+  // The list view only has the slim summary shape (id/title/status/priority/dueDate/labels/tags) —
+  // fetch the full record once opened so description/energy/estimatedMinutes are real, not blank.
+  const { data: fullTask } = useQuery({
+    queryKey: ['tasks', taskSummary?.id],
+    queryFn: () => tasksApi.get(taskSummary.id).then((res) => res.data),
+    enabled: Boolean(isOpen && taskSummary?.id)
+  });
+
+  const task = fullTask || taskSummary;
+  const [form, setForm] = useState(EMPTY_FORM);
+
+  useEffect(() => {
+    if (!task) return;
+    setForm({
+      title: task.title || '',
+      description: task.description || '',
+      priority: task.priority || 'medium',
+      dueDate: task.dueDate ? task.dueDate.split('T')[0] : '',
+      estimatedMinutes: task.estimatedMinutes ?? 30,
+      energy: task.energy || 'medium'
+    });
+  }, [task?.id, fullTask]);
+
+  if (!taskSummary) return null;
+
+  const handleSave = () => {
+    onSave(task.id, {
+      title: form.title,
+      description: form.description,
+      priority: form.priority,
+      dueDate: form.dueDate ? new Date(form.dueDate).toISOString() : null,
+      estimatedMinutes: Number(form.estimatedMinutes) || 0,
+      energy: form.energy
+    });
+    onClose();
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
             className="fixed inset-0 bg-text-heading/20 backdrop-blur-sm z-40"
           />
-          <motion.div 
+          <motion.div
             initial={{ x: '100%', opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
             exit={{ x: '100%', opacity: 0 }}
@@ -26,12 +65,17 @@ export const TaskDetailDrawer = ({ task, isOpen, onClose, onDelete }) => {
             <div className="h-16 border-b border-border-default flex items-center justify-between px-6 shrink-0 bg-surface-secondary/50 backdrop-blur-md">
               <span className="font-semibold text-text-muted uppercase tracking-wider text-xs">Task Details</span>
               <div className="flex items-center gap-2">
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
+                <button
+                  onClick={() => { onArchive(task.id); onClose(); }}
+                  className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors"
+                  aria-label="Archive task"
+                >
                   <Archive size={18} />
                 </button>
-                <button 
+                <button
                   onClick={() => onDelete(task.id)}
                   className="p-2 text-text-muted hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
+                  aria-label="Delete task"
                 >
                   <Trash2 size={18} />
                 </button>
@@ -41,17 +85,19 @@ export const TaskDetailDrawer = ({ task, isOpen, onClose, onDelete }) => {
                 </button>
               </div>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto p-6 space-y-8">
               <div>
-                <input 
-                  type="text" 
-                  defaultValue={task.title}
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
                   className="w-full text-2xl font-bold text-text-heading bg-transparent border-none p-0 focus:outline-none focus:ring-0 resize-none"
                   placeholder="Task title..."
                 />
-                <textarea 
-                  defaultValue={task.description}
+                <textarea
+                  value={form.description}
+                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
                   className="w-full text-sm text-text-muted bg-transparent border-none p-0 mt-3 focus:outline-none focus:ring-0 resize-none min-h-[100px]"
                   placeholder="Add a description..."
                 />
@@ -61,16 +107,25 @@ export const TaskDetailDrawer = ({ task, isOpen, onClose, onDelete }) => {
                 <div className="p-4 rounded-xl border border-border-default bg-surface-secondary/30 space-y-4">
                   <div className="flex items-center gap-3 text-sm">
                     <Flag size={16} className="text-text-muted shrink-0" />
-                    <select className="bg-transparent font-semibold focus:outline-none w-full cursor-pointer text-text-heading" defaultValue={task.priority}>
-                      <option value="High">High Priority</option>
-                      <option value="Medium">Medium Priority</option>
-                      <option value="Low">Low Priority</option>
-                      <option value="None">No Priority</option>
+                    <select
+                      value={form.priority}
+                      onChange={(e) => setForm((f) => ({ ...f, priority: e.target.value }))}
+                      className="bg-transparent font-semibold focus:outline-none w-full cursor-pointer text-text-heading"
+                    >
+                      <option value="urgent">Urgent Priority</option>
+                      <option value="high">High Priority</option>
+                      <option value="medium">Medium Priority</option>
+                      <option value="low">Low Priority</option>
                     </select>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Calendar size={16} className="text-text-muted shrink-0" />
-                    <input type="date" defaultValue={task.dueDate?.split('T')[0]} className="bg-transparent font-medium focus:outline-none w-full text-text-heading cursor-pointer" />
+                    <input
+                      type="date"
+                      value={form.dueDate}
+                      onChange={(e) => setForm((f) => ({ ...f, dueDate: e.target.value }))}
+                      className="bg-transparent font-medium focus:outline-none w-full text-text-heading cursor-pointer"
+                    />
                   </div>
                 </div>
 
@@ -78,16 +133,26 @@ export const TaskDetailDrawer = ({ task, isOpen, onClose, onDelete }) => {
                   <div className="flex items-center gap-3 text-sm">
                     <Clock size={16} className="text-text-muted shrink-0" />
                     <div className="flex items-center gap-1 w-full">
-                      <input type="number" defaultValue={task.estimatedTime || 30} className="bg-transparent font-semibold focus:outline-none w-10 text-text-heading" />
+                      <input
+                        type="number"
+                        min="0"
+                        value={form.estimatedMinutes}
+                        onChange={(e) => setForm((f) => ({ ...f, estimatedMinutes: e.target.value }))}
+                        className="bg-transparent font-semibold focus:outline-none w-10 text-text-heading"
+                      />
                       <span className="text-text-muted font-medium">mins</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm">
                     <Activity size={16} className="text-text-muted shrink-0" />
-                    <select className="bg-transparent font-semibold focus:outline-none w-full cursor-pointer text-text-heading" defaultValue={task.energy || 'Medium'}>
-                      <option value="High">High Energy</option>
-                      <option value="Medium">Medium Energy</option>
-                      <option value="Low">Low Energy</option>
+                    <select
+                      value={form.energy}
+                      onChange={(e) => setForm((f) => ({ ...f, energy: e.target.value }))}
+                      className="bg-transparent font-semibold focus:outline-none w-full cursor-pointer text-text-heading"
+                    >
+                      <option value="high">High Energy</option>
+                      <option value="medium">Medium Energy</option>
+                      <option value="low">Low Energy</option>
                     </select>
                   </div>
                 </div>
@@ -96,16 +161,18 @@ export const TaskDetailDrawer = ({ task, isOpen, onClose, onDelete }) => {
               <div className="space-y-3">
                 <h4 className="font-semibold text-text-heading text-sm">Tags & Labels</h4>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 rounded-full bg-surface-secondary border border-border-default text-xs font-semibold text-text-muted flex items-center gap-1 cursor-pointer hover:bg-surface-primary">
-                    <Tag size={12} /> Add Tag
-                  </span>
+                  {(task.tags || []).map((tag) => (
+                    <span key={tag} className="px-3 py-1 rounded-full bg-surface-secondary border border-border-default text-xs font-semibold text-text-muted flex items-center gap-1">
+                      <Tag size={12} /> {tag}
+                    </span>
+                  ))}
                 </div>
               </div>
             </div>
-            
+
             <div className="p-6 border-t border-border-default bg-surface-primary shrink-0">
-              <button 
-                onClick={onClose}
+              <button
+                onClick={handleSave}
                 className="w-full py-3 rounded-xl bg-text-heading text-surface-primary font-bold shadow-sm hover:shadow-md transition-all"
               >
                 Save Changes

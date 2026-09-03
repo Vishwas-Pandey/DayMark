@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Calendar, Plus, Clock } from 'lucide-react';
 import { useCalendar } from '../../../hooks/useCalendar';
 import { WidgetSkeleton } from '../../../components/common/Skeletons';
 import { EmptyState } from '../../../components/common/EmptyStates';
+import Modal from '../../../components/common/Modal';
+import TaskForm from '../../../components/TaskForm';
 
 export const CalendarWidget = () => {
   const { data: events, isLoading, error } = useCalendar();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   if (isLoading) return <WidgetSkeleton />;
   if (error) return <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-600 h-full">Failed to load schedule.</div>;
@@ -25,7 +28,11 @@ export const CalendarWidget = () => {
         <h3 className="font-bold text-text-heading flex items-center gap-2">
           Schedule <span className="bg-surface-secondary text-text-muted px-2 py-0.5 rounded-full text-xs font-semibold">Today</span>
         </h3>
-        <button className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors">
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors"
+          aria-label="Add event"
+        >
           <Plus size={16} />
         </button>
       </div>
@@ -57,6 +64,10 @@ export const CalendarWidget = () => {
           ))}
         </div>
       </div>
+
+      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Event">
+        <TaskForm onSuccess={() => setIsCreateOpen(false)} onClose={() => setIsCreateOpen(false)} defaultType="event" />
+      </Modal>
     </motion.div>
   );
 };

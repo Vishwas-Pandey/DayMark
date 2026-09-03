@@ -1,13 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Book, Plus } from 'lucide-react';
 import { useJournal } from '../../../hooks/useJournal';
 import { WidgetSkeleton } from '../../../components/common/Skeletons';
 import { EmptyState } from '../../../components/common/EmptyStates';
 import { moodEmoji } from '../../journal/utils/mood';
+import { JournalEditor } from '../../journal/components/JournalEditor';
 
 export const JournalWidget = () => {
   const { data: entries, isLoading, error } = useJournal();
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
 
   if (isLoading) return <WidgetSkeleton />;
   if (error) return <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-600 h-full">Failed to load journal.</div>;
@@ -24,7 +26,11 @@ export const JournalWidget = () => {
         <h3 className="font-bold text-text-heading flex items-center gap-2">
           Journal
         </h3>
-        <button className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors">
+        <button
+          onClick={() => setIsEditorOpen(true)}
+          className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors"
+          aria-label="New journal entry"
+        >
           <Plus size={16} />
         </button>
       </div>
@@ -42,11 +48,13 @@ export const JournalWidget = () => {
             </div>
             <h4 className="text-sm font-bold text-text-heading mb-2 truncate">{latestEntry.title}</h4>
             <p className="text-xs text-text-muted line-clamp-4 leading-relaxed whitespace-pre-wrap">
-              {latestEntry.content || 'Empty entry...'}
+              {latestEntry.excerpt || 'Empty entry...'}
             </p>
           </div>
         )}
       </div>
+
+      <JournalEditor isOpen={isEditorOpen} entry={null} onClose={() => setIsEditorOpen(false)} onSave={() => setIsEditorOpen(false)} />
     </motion.div>
   );
 };

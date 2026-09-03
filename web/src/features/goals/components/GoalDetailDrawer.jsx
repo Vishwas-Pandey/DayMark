@@ -1,14 +1,14 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Edit3, Trash2, CheckCircle2, TrendingUp, Plus } from 'lucide-react';
+import { X, Calendar, Trash2, CheckCircle2, TrendingUp, Plus } from 'lucide-react';
 import { GoalProgressBar } from './GoalProgressBar';
 import { computeGoalHealth } from '../utils/goalHealth';
 import { goalsApi } from '../../../api/goals';
 
 const HEALTH_LABEL = { 'on-track': 'On Track', 'at-risk': 'At Risk', behind: 'Behind' };
 
-export const GoalDetailDrawer = ({ goal: goalSummary, isOpen, onClose, onDelete, onUpdateProgress }) => {
+export const GoalDetailDrawer = ({ goal: goalSummary, isOpen, onClose, onDelete, onUpdateProgress, onMarkComplete }) => {
   // The list view only has the slim summary shape — fetch the full record
   // (progress.targetValue/currentValue/unit, description, timeline) once opened.
   const { data: fullGoal } = useQuery({
@@ -51,13 +51,15 @@ export const GoalDetailDrawer = ({ goal: goalSummary, isOpen, onClose, onDelete,
             <div className="h-16 border-b border-border-default flex items-center justify-between px-6 shrink-0 bg-surface-secondary/50 backdrop-blur-md">
               <span className="font-semibold text-text-muted uppercase tracking-wider text-xs">Goal Details</span>
               <div className="flex items-center gap-2">
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
-                  <CheckCircle2 size={18} />
+                <button
+                  onClick={() => onMarkComplete(goal.id)}
+                  disabled={goal.status === 'completed'}
+                  className="p-2 text-text-muted hover:text-green-600 rounded-lg hover:bg-green-50 transition-colors disabled:opacity-40 disabled:pointer-events-none"
+                  aria-label="Mark goal complete"
+                >
+                  <CheckCircle2 size={18} className={goal.status === 'completed' ? 'text-green-600 fill-green-100' : ''} />
                 </button>
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
-                  <Edit3 size={18} />
-                </button>
-                <button 
+                <button
                   onClick={() => onDelete(goal.id)}
                   className="p-2 text-text-muted hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
                 >

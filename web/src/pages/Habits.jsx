@@ -9,7 +9,7 @@ import Modal from '../components/common/Modal';
 import TaskForm from '../components/TaskForm';
 
 export const Habits = () => {
-  const { data: habits, isLoading, error, toggleHabit, deleteHabit, refetch } = useHabits();
+  const { data: habits, isLoading, error, toggleHabit, deleteHabit, updateHabit, refetch } = useHabits();
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedHabit, setSelectedHabit] = useState(null);
@@ -41,6 +41,10 @@ export const Habits = () => {
       deleteHabit.mutate(id);
       setSelectedHabit(null);
     }
+  };
+
+  const handleTogglePause = (id, status) => {
+    updateHabit.mutate({ id, data: { status } });
   };
 
   return (
@@ -75,6 +79,7 @@ export const Habits = () => {
         isOpen={!!selectedHabit} 
         onClose={() => setSelectedHabit(null)}
         onDelete={handleDelete}
+        onTogglePause={handleTogglePause}
       />
 
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Habit">

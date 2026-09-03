@@ -1,27 +1,35 @@
 import React from 'react';
 import { Plus, BookOpen, Heart, Flame, PenTool } from 'lucide-react';
+import { moodEmoji } from '../utils/mood';
+
+const dayKey = (date) => new Date(date).toDateString();
 
 export const JournalHeader = ({ entries, onOpenCreate }) => {
   const totalEntries = entries?.length || 0;
-  
-  // Calculate stats based on mocked/real backend data
-  const favorites = entries?.filter(e => e.tags?.includes('favorite'))?.length || 0;
-  
-  // Calculate approximate words and reading time from content
-  const totalWords = entries?.reduce((acc, e) => {
-    return acc + (e.content ? e.content.split(/\s+/).length : 0);
-  }, 0) || 0;
 
-  const getMoodEmoji = () => {
-    if (!entries || entries.length === 0) return '😐';
-    const moods = entries.map(e => e.mood).filter(Boolean);
-    if (moods.length === 0) return '😐';
-    
-    // Simplistic average mood logic for UI scaffolding
-    const goodMoods = ['Great', 'Good', 'Happy', 'Excited', 'Focused', '😊', '🚀', '🌟'];
-    const countGood = moods.filter(m => goodMoods.includes(m)).length;
-    return (countGood / moods.length) > 0.5 ? '😊' : '😐';
-  };
+  const favorites = entries?.filter(e => e.favorite)?.length || 0;
+
+  const totalWords = entries?.reduce((acc, e) => acc + (e.wordCount || 0), 0) || 0;
+
+  const moodScores = (entries || []).map(e => e.mood?.score).filter((s) => typeof s === 'number');
+  const avgMoodScore = moodScores.length ? moodScores.reduce((a, b) => a + b, 0) / moodScores.length : null;
+  const moodLabel = avgMoodScore == null ? 'No entries yet'
+    : avgMoodScore >= 8 ? 'Thriving'
+    : avgMoodScore >= 6 ? 'Stable & Positive'
+    : avgMoodScore >= 4 ? 'Mixed'
+    : 'Rough Patch';
+
+  const streakDays = (() => {
+    const days = new Set((entries || []).map(e => dayKey(e.createdAt)));
+    let streak = 0;
+    const cursor = new Date();
+    if (!days.has(dayKey(cursor))) cursor.setDate(cursor.getDate() - 1);
+    while (days.has(dayKey(cursor))) {
+      streak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+    }
+    return streak;
+  })();
 
   return (
     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
@@ -38,7 +46,7 @@ export const JournalHeader = ({ entries, onOpenCreate }) => {
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-secondary border border-border-default rounded-xl shadow-sm">
             <Flame size={16} className="text-orange-500" />
-            <span className="text-sm font-semibold text-text-heading">3 <span className="text-text-muted font-medium">Day Streak</span></span>
+            <span className="text-sm font-semibold text-text-heading">{streakDays} <span className="text-text-muted font-medium">Day Streak</span></span>
           </div>
           <div className="flex items-center gap-2 px-3 py-1.5 bg-pink-50 border border-pink-200 rounded-xl shadow-sm">
             <Heart size={16} className="text-pink-500" />
@@ -51,8 +59,8 @@ export const JournalHeader = ({ entries, onOpenCreate }) => {
         <div className="flex-1">
           <p className="text-xs font-bold text-text-muted uppercase tracking-wider mb-2">Average Mood</p>
           <div className="flex items-center gap-3">
-            <span className="text-3xl">{getMoodEmoji()}</span>
-            <span className="text-sm font-bold text-text-heading">Stable & Positive</span>
+            <span className="text-3xl">{moodEmoji({ score: avgMoodScore })}</span>
+            <span className="text-sm font-bold text-text-heading">{moodLabel}</span>
           </div>
         </div>
         

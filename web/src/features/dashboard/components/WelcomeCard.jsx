@@ -7,7 +7,7 @@ import { WidgetSkeleton } from '../../../components/common/Skeletons';
 export const WelcomeCard = () => {
   const { user } = useAuthContext();
   const { data: analytics, isLoading } = useAnalytics('today');
-  const score = analytics?.scores?.productivity;
+  const score = analytics?.scores?.productivityScore;
 
   const getGreeting = () => {
     const hour = new Date().getHours();
@@ -49,7 +49,7 @@ export const WelcomeCard = () => {
         <span className="text-sm font-medium text-text-muted">Productivity Score</span>
         <div className="flex items-end gap-1">
           <span className="text-3xl font-bold text-interactive-primary leading-none">
-            {analytics?.score || 0}
+            {score || 0}
           </span>
           <span className="text-sm text-text-muted font-medium mb-1">/ 100</span>
         </div>

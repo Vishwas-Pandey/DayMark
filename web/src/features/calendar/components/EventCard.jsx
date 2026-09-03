@@ -34,7 +34,7 @@ export const EventCard = ({ event, isAgenda, onClick }) => {
           <div className="flex flex-wrap gap-3 text-xs opacity-80 font-medium">
             {event.location?.location && <span className="flex items-center gap-1"><MapPin size={12}/> {event.location.location}</span>}
             {event.participants?.length > 0 && <span className="flex items-center gap-1"><Users size={12}/> {event.participants.length}</span>}
-            {event.duration && <span className="flex items-center gap-1"><Clock size={12}/> {event.duration}m</span>}
+            {event.time?.durationMinutes && <span className="flex items-center gap-1"><Clock size={12}/> {event.time.durationMinutes}m</span>}
           </div>
         </div>
         {isCompleted && <CheckCircle2 size={20} className="text-green-500 shrink-0" />}

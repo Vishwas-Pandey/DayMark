@@ -17,14 +17,9 @@ export const Calendar = () => {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
-  // Filter events for the current date view (simplified logic for scaffolding)
   const displayEvents = events?.filter(e => {
     const eventDate = new Date(e.time?.start);
-    if (view === 'day' || view === 'agenda') {
-      return eventDate.toDateString() === currentDate.toDateString();
-    }
-    // Stub for week/month
-    return true; 
+    return eventDate.toDateString() === currentDate.toDateString();
   }).sort((a, b) => new Date(a.time?.start) - new Date(b.time?.start)) || [];
 
   const handleDelete = (id) => {

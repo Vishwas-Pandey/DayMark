@@ -32,6 +32,7 @@ export const toJournalSummaryDTO = (entry) => {
     title: obj.title,
     excerpt: obj.excerpt,
     type: obj.type,
+    mood: obj.mood,
     tags: obj.tags,
     favorite: obj.favorite,
     pinned: obj.pinned,

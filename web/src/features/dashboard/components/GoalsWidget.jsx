@@ -1,21 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Target, Plus } from 'lucide-react';
 import { useGoals } from '../../../hooks/useGoals';
 import { WidgetSkeleton } from '../../../components/common/Skeletons';
 import { EmptyState } from '../../../components/common/EmptyStates';
+import Modal from '../../../components/common/Modal';
+import TaskForm from '../../../components/TaskForm';
 
 export const GoalsWidget = () => {
   const { data: goals, isLoading, error } = useGoals();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   if (isLoading) return <WidgetSkeleton />;
   if (error) return <div className="p-4 rounded-xl border border-red-200 bg-red-50 text-red-600 h-full">Failed to load goals.</div>;
-  
+
   const activeGoals = goals?.filter(g => g.status === 'active') || [];
 
   if (activeGoals.length === 0) return (
-    <div className="p-4 rounded-xl border border-border-default bg-surface-primary h-full flex flex-col justify-center">
+    <div className="p-4 rounded-xl border border-border-default bg-surface-primary h-full flex flex-col justify-center items-center gap-3">
       <EmptyState title="No active goals" message="Set a goal to track your progress." />
+      <button
+        onClick={() => setIsCreateOpen(true)}
+        className="px-3 py-1.5 rounded-lg bg-interactive-primary/10 text-interactive-primary text-xs font-semibold hover:bg-interactive-primary/20 transition-colors"
+      >
+        Add Goal
+      </button>
+      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Goal">
+        <TaskForm onSuccess={() => setIsCreateOpen(false)} onClose={() => setIsCreateOpen(false)} defaultType="goal" />
+      </Modal>
     </div>
   );
 
@@ -27,7 +39,11 @@ export const GoalsWidget = () => {
     >
       <div className="flex justify-between items-center mb-4">
         <h3 className="font-bold text-text-heading">Active Goals</h3>
-        <button className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors">
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors"
+          aria-label="Add goal"
+        >
           <Plus size={16} />
         </button>
       </div>
@@ -64,6 +80,10 @@ export const GoalsWidget = () => {
           );
         })}
       </div>
+
+      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Goal">
+        <TaskForm onSuccess={() => setIsCreateOpen(false)} onClose={() => setIsCreateOpen(false)} defaultType="goal" />
+      </Modal>
     </motion.div>
   );
 };

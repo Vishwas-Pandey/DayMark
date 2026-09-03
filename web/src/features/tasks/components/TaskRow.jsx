@@ -1,15 +1,16 @@
 import React from 'react';
-import { CheckCircle2, Circle, Clock, GripVertical, AlertCircle, Battery, Zap } from 'lucide-react';
+import { CheckCircle2, Circle, Clock, AlertCircle, Battery, Zap } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const TaskRow = ({ task, onToggle, onClick, isSelected, onSelect }) => {
   const isCompleted = task.status === 'completed';
-  
+
   const getPriorityColor = (priority) => {
     switch(priority) {
-      case 'High': return 'text-red-500 bg-red-500/10 border-red-500/20';
-      case 'Medium': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
-      case 'Low': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
+      case 'urgent': return 'text-red-600 bg-red-500/10 border-red-500/20';
+      case 'high': return 'text-red-500 bg-red-500/10 border-red-500/20';
+      case 'medium': return 'text-orange-500 bg-orange-500/10 border-orange-500/20';
+      case 'low': return 'text-blue-500 bg-blue-500/10 border-blue-500/20';
       default: return 'text-text-muted bg-surface-secondary border-border-default';
     }
   };
@@ -29,10 +30,7 @@ export const TaskRow = ({ task, onToggle, onClick, isSelected, onSelect }) => {
     >
       <div className="flex items-center gap-3 w-full sm:w-auto">
         <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
-          <button className="text-text-muted/30 hover:text-text-muted cursor-grab hidden md:block">
-            <GripVertical size={16} />
-          </button>
-          <input 
+          <input
             type="checkbox" 
             checked={isSelected} 
             onChange={onSelect}
@@ -83,9 +81,9 @@ export const TaskRow = ({ task, onToggle, onClick, isSelected, onSelect }) => {
           </span>
         )}
         
-        {task.estimatedTime && (
+        {task.estimatedMinutes && (
           <span className="flex items-center gap-1 text-[11px] font-medium text-text-muted bg-surface-secondary px-2 py-1 rounded-md border border-border-default shrink-0">
-            <Clock size={12} /> {task.estimatedTime}m
+            <Clock size={12} /> {task.estimatedMinutes}m
           </span>
         )}
       </div>

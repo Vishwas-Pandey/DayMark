@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Clock, MapPin, AlignLeft, Users, Edit3, Trash2 } from 'lucide-react';
+import { X, Clock, MapPin, AlignLeft, Users, Trash2 } from 'lucide-react';
 import { calendarApi } from '../../../api/calendar';
 
 export const EventDetailDrawer = ({ event: eventSummary, isOpen, onClose, onDelete }) => {
@@ -37,10 +37,7 @@ export const EventDetailDrawer = ({ event: eventSummary, isOpen, onClose, onDele
             <div className="h-16 border-b border-border-default flex items-center justify-between px-6 shrink-0 bg-surface-secondary/50 backdrop-blur-md">
               <span className="font-semibold text-text-muted uppercase tracking-wider text-xs">Event Details</span>
               <div className="flex items-center gap-2">
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
-                  <Edit3 size={18} />
-                </button>
-                <button 
+                <button
                   onClick={() => onDelete(event.id)}
                   className="p-2 text-text-muted hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
                 >

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Filter } from 'lucide-react';
+import { Search } from 'lucide-react';
 
 export const GoalFilterBar = ({ currentFilter, onFilterChange, onSearch }) => {
   const filters = [
@@ -38,9 +38,6 @@ export const GoalFilterBar = ({ currentFilter, onFilterChange, onSearch }) => {
             className="w-full pl-9 pr-4 py-2 bg-surface-primary border border-border-default rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-interactive-primary focus:border-transparent transition-all shadow-sm"
           />
         </div>
-        <button className="p-2 bg-surface-primary border border-border-default text-text-muted hover:text-text-heading rounded-xl shadow-sm hover:shadow-md transition-all">
-          <Filter size={20} />
-        </button>
       </div>
     </div>
   );

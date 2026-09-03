@@ -1,4 +1,5 @@
 import React from 'react';
+import { moodEmoji } from '../../journal/utils/mood';
 
 export const AnalyticsModuleBreakdown = ({ data }) => {
   const modules = [
@@ -7,23 +8,23 @@ export const AnalyticsModuleBreakdown = ({ data }) => {
       metrics: [
         { label: 'Completed', value: data?.tasks?.completed || 0 },
         { label: 'Overdue', value: data?.tasks?.overdue || 0 },
-        { label: 'Completion Rate', value: '87%' }
+        { label: 'Completion Rate', value: `${Math.round(data?.tasks?.completionRate || 0)}%` }
       ]
     },
     {
       title: 'Goal Analytics',
       metrics: [
-        { label: 'On Track', value: 4 },
-        { label: 'Behind', value: 1 },
-        { label: 'Average Velocity', value: '+5%/wk' }
+        { label: 'Active', value: data?.goals?.active || 0 },
+        { label: 'Completed', value: data?.goals?.completed || 0 },
+        { label: 'Average Progress', value: `${Math.round(data?.goals?.avgProgress || 0)}%` }
       ]
     },
     {
       title: 'Journal Analytics',
       metrics: [
-        { label: 'Words Written', value: data?.journal?.wordsWritten || 0 },
-        { label: 'Avg Mood', value: data?.journal?.averageMood || '😐' },
-        { label: 'Reading Time', value: '12m' }
+        { label: 'Entries', value: data?.journal?.entries || 0 },
+        { label: 'Words Written', value: data?.journal?.words || 0 },
+        { label: 'Avg Mood', value: moodEmoji({ score: data?.journal?.avgMood }) }
       ]
     }
   ];

@@ -48,6 +48,7 @@ export const useHabits = () => {
     delete: deleteMutation.mutateAsync,
     // Resource-specific aliases (full mutation objects, so `.mutate(...)` works directly)
     createHabit: createMutation,
+    updateHabit: updateMutation,
     deleteHabit: deleteMutation,
     // Marks a habit complete for today via the dedicated completion endpoint
     // (habits have no `completedDates` field — completions are tracked separately)

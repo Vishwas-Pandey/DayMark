@@ -4,34 +4,24 @@ import { ChevronLeft, ChevronRight, CalendarDays, LayoutList } from 'lucide-reac
 export const CalendarToolbar = ({ currentDate, setCurrentDate, view, setView }) => {
   const views = [
     { id: 'day', label: 'Day' },
-    { id: 'week', label: 'Week' },
-    { id: 'month', label: 'Month' },
     { id: 'agenda', label: 'Agenda', icon: LayoutList }
   ];
 
   const goPrev = () => {
     const d = new Date(currentDate);
-    if(view === 'day' || view === 'agenda') d.setDate(d.getDate() - 1);
-    if(view === 'week') d.setDate(d.getDate() - 7);
-    if(view === 'month') d.setMonth(d.getMonth() - 1);
+    d.setDate(d.getDate() - 1);
     setCurrentDate(d);
   };
 
   const goNext = () => {
     const d = new Date(currentDate);
-    if(view === 'day' || view === 'agenda') d.setDate(d.getDate() + 1);
-    if(view === 'week') d.setDate(d.getDate() + 7);
-    if(view === 'month') d.setMonth(d.getMonth() + 1);
+    d.setDate(d.getDate() + 1);
     setCurrentDate(d);
   };
 
   const goToday = () => setCurrentDate(new Date());
 
-  const getDisplayDate = () => {
-    if (view === 'month') return currentDate.toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
-    if (view === 'week') return `Week of ${currentDate.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}`;
-    return currentDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
-  };
+  const getDisplayDate = () => currentDate.toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
 
   return (
     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 bg-surface-primary p-3 rounded-2xl border border-border-default shadow-sm">

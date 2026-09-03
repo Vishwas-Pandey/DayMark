@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Target, CheckSquare, Calendar, Activity, Clock } from 'lucide-react';
+import { Target, CheckSquare, Calendar, Activity } from 'lucide-react';
 import { useTasks } from '../../../hooks/useTasks';
 import { useGoals } from '../../../hooks/useGoals';
 import { useCalendar } from '../../../hooks/useCalendar';
@@ -15,9 +15,9 @@ export const TodaysFocus = () => {
 
   if (isLoading) return <WidgetSkeleton className="h-40 w-full rounded-2xl mb-6" />;
 
-  const highPriorityTask = tasks?.find(t => t.priority === 'High' && t.status !== 'completed');
-  const activeGoal = goals?.find(g => g.status === 'in-progress');
-  const nextEvent = events?.find(e => new Date(e.startTime) > new Date()) || events?.[0];
+  const highPriorityTask = tasks?.find(t => (t.priority === 'high' || t.priority === 'urgent') && t.status !== 'completed');
+  const activeGoal = goals?.find(g => g.status === 'active');
+  const nextEvent = events?.find(e => new Date(e.time?.start) > new Date());
 
   return (
     <motion.div 
@@ -30,9 +30,6 @@ export const TodaysFocus = () => {
         <h2 className="text-lg font-bold text-text-heading flex items-center gap-2">
           <Target size={20} className="text-interactive-primary" /> Today's Focus
         </h2>
-        <span className="text-xs font-semibold px-2.5 py-1 bg-interactive-primary/10 text-interactive-primary rounded-md flex items-center gap-1 w-fit">
-          <Clock size={12} /> Est. Finish: 6:00 PM
-        </span>
       </div>
       
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

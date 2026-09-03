@@ -10,7 +10,7 @@ import Modal from '../components/common/Modal';
 import TaskForm from '../components/TaskForm';
 
 export const Goals = () => {
-  const { data: goals, isLoading, error, deleteGoal, updateGoalProgress, refetch } = useGoals();
+  const { data: goals, isLoading, error, deleteGoal, updateGoalProgress, updateGoal, refetch } = useGoals();
   const [filter, setFilter] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedGoal, setSelectedGoal] = useState(null);
@@ -36,6 +36,10 @@ export const Goals = () => {
 
   const handleUpdateProgress = (id, newValue) => {
     updateGoalProgress.mutate({ id, data: { currentValue: newValue } });
+  };
+
+  const handleMarkComplete = (id) => {
+    updateGoal.mutate({ id, data: { status: 'completed' } });
   };
 
   return (
@@ -70,6 +74,7 @@ export const Goals = () => {
         onClose={() => setSelectedGoal(null)}
         onDelete={handleDelete}
         onUpdateProgress={handleUpdateProgress}
+        onMarkComplete={handleMarkComplete}
       />
 
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Goal">

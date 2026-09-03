@@ -1,16 +1,17 @@
 import React from 'react';
 import { CheckSquare, Activity, Target, Clock, CalendarDays, BookOpen, Smile, Flame } from 'lucide-react';
+import { moodEmoji } from '../../journal/utils/mood';
 
 export const AnalyticsOverviewCards = ({ data }) => {
   const cards = [
     { title: 'Tasks Completed', value: data?.tasks?.completed || 0, icon: CheckSquare, color: 'text-blue-500', bg: 'bg-blue-50', border: 'border-blue-200' },
-    { title: 'Habits Completed', value: data?.habits?.completed || 0, icon: Activity, color: 'text-green-500', bg: 'bg-green-50', border: 'border-green-200' },
-    { title: 'Goal Progress', value: `${Math.round(data?.goals?.averageProgress || 0)}%`, icon: Target, color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-200' },
-    { title: 'Focus Hours', value: Math.round((data?.calendar?.focusMinutes || 0)/60), icon: Clock, color: 'text-purple-500', bg: 'bg-purple-50', border: 'border-purple-200' },
-    { title: 'Meetings', value: data?.calendar?.meetingCount || 0, icon: CalendarDays, color: 'text-indigo-500', bg: 'bg-indigo-50', border: 'border-indigo-200' },
+    { title: 'Habit Completions', value: data?.habits?.totalCompletions || 0, icon: Activity, color: 'text-green-500', bg: 'bg-green-50', border: 'border-green-200' },
+    { title: 'Goal Progress', value: `${Math.round(data?.goals?.avgProgress || 0)}%`, icon: Target, color: 'text-orange-500', bg: 'bg-orange-50', border: 'border-orange-200' },
+    { title: 'Focus Hours', value: Math.round((data?.calendar?.focusTime || 0) / 60), icon: Clock, color: 'text-purple-500', bg: 'bg-purple-50', border: 'border-purple-200' },
+    { title: 'Meeting Hours', value: Math.round((data?.calendar?.meetingTime || 0) / 60), icon: CalendarDays, color: 'text-indigo-500', bg: 'bg-indigo-50', border: 'border-indigo-200' },
     { title: 'Journal Entries', value: data?.journal?.entries || 0, icon: BookOpen, color: 'text-teal-500', bg: 'bg-teal-50', border: 'border-teal-200' },
-    { title: 'Average Mood', value: data?.journal?.averageMood || '😐', icon: Smile, color: 'text-pink-500', bg: 'bg-pink-50', border: 'border-pink-200' },
-    { title: 'Current Streak', value: `${data?.habits?.longestStreak || 0}d`, icon: Flame, color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-200' }
+    { title: 'Average Mood', value: moodEmoji({ score: data?.journal?.avgMood }), icon: Smile, color: 'text-pink-500', bg: 'bg-pink-50', border: 'border-pink-200' },
+    { title: 'Longest Streak', value: `${data?.habits?.maxStreak || 0}d`, icon: Flame, color: 'text-red-500', bg: 'bg-red-50', border: 'border-red-200' }
   ];
 
   return (

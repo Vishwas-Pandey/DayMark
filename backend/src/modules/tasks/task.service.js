@@ -65,12 +65,22 @@ export const taskService = {
   updateTask: async (id, userId, data) => {
     const task = await taskRepository.findById(id, userId);
     if (!task) throw new NotFoundError('Task not found');
-    
+
     data.updatedBy = userId;
     if (data.metadata) {
       data['metadata.lastEdited'] = new Date();
     }
-    
+
+    // Keep completedAt in sync when a generic update flips status, so it isn't
+    // only set via the dedicated complete/reopen endpoints.
+    if (data.status && data.status !== task.status) {
+      if (data.status === 'completed' && data.completedAt === undefined) {
+        data.completedAt = new Date();
+      } else if (task.status === 'completed' && data.status !== 'completed' && data.completedAt === undefined) {
+        data.completedAt = null;
+      }
+    }
+
     const updated = await taskRepository.update(id, userId, data);
     logger.info({ userId, taskId: id, action: 'TASK_UPDATED' }, 'Task updated');
     return updated;

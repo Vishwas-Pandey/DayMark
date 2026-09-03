@@ -31,7 +31,7 @@ export const AllTasks = () => {
       const isOverdue = new Date(task.dueDate) < new Date();
       return isOverdue && task.status !== 'completed';
     }
-    return true; // 'all' or fallback
+    return task.status !== 'archived'; // 'all' or fallback
   }) || [];
 
   const handleToggleTask = (task) => {
@@ -50,6 +50,14 @@ export const AllTasks = () => {
       deleteTask.mutate(id);
       setSelectedTask(null);
     }
+  };
+
+  const handleSaveTask = (id, data) => {
+    updateTask.mutate({ id, data });
+  };
+
+  const handleArchiveTask = (id) => {
+    updateTask.mutate({ id, data: { status: 'archived', archived: true } });
   };
 
   const handleBulkComplete = () => {
@@ -90,11 +98,13 @@ export const AllTasks = () => {
         </ErrorBoundary>
       </div>
 
-      <TaskDetailDrawer 
-        task={selectedTask} 
-        isOpen={!!selectedTask} 
+      <TaskDetailDrawer
+        task={selectedTask}
+        isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
         onDelete={handleDelete}
+        onSave={handleSaveTask}
+        onArchive={handleArchiveTask}
       />
 
       <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Task">

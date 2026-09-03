@@ -1,13 +1,13 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Flame, Target, Activity, BarChart2, Edit3, Trash2, PauseCircle } from 'lucide-react';
+import { X, Flame, Target, Activity, BarChart2, Trash2, PauseCircle, PlayCircle } from 'lucide-react';
 import { HabitProgressRing } from './HabitProgressRing';
 import { habitsApi } from '../../../api/habits';
 
 const DAYS_SHOWN = 119; // ~17 weeks
 
-export const HabitDetailDrawer = ({ habit: habitSummary, isOpen, onClose, onDelete }) => {
+export const HabitDetailDrawer = ({ habit: habitSummary, isOpen, onClose, onDelete, onTogglePause }) => {
   const { data: history } = useQuery({
     queryKey: ['habits', habitSummary?.id, 'history'],
     queryFn: () => habitsApi.getHistory(habitSummary.id).then(res => res.data),
@@ -57,13 +57,14 @@ export const HabitDetailDrawer = ({ habit: habitSummary, isOpen, onClose, onDele
             <div className="h-16 border-b border-border-default flex items-center justify-between px-6 shrink-0 bg-surface-secondary/50 backdrop-blur-md">
               <span className="font-semibold text-text-muted uppercase tracking-wider text-xs">Habit Overview</span>
               <div className="flex items-center gap-2">
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
-                  <PauseCircle size={18} />
+                <button
+                  onClick={() => onTogglePause(habit.id, habit.status === 'paused' ? 'active' : 'paused')}
+                  className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors"
+                  aria-label={habit.status === 'paused' ? 'Resume habit' : 'Pause habit'}
+                >
+                  {habit.status === 'paused' ? <PlayCircle size={18} /> : <PauseCircle size={18} />}
                 </button>
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
-                  <Edit3 size={18} />
-                </button>
-                <button 
+                <button
                   onClick={() => onDelete(habit.id)}
                   className="p-2 text-text-muted hover:text-red-500 rounded-lg hover:bg-red-50 transition-colors"
                 >

@@ -1,11 +1,11 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Calendar, Edit3, Trash2, Heart, Share } from 'lucide-react';
+import { X, Calendar, Edit3, Trash2, Heart } from 'lucide-react';
 import { moodEmoji } from '../utils/mood';
 import { journalApi } from '../../../api/journal';
 
-export const JournalDetailDrawer = ({ entry: entrySummary, isOpen, onClose, onDelete, onEdit }) => {
+export const JournalDetailDrawer = ({ entry: entrySummary, isOpen, onClose, onDelete, onEdit, onToggleFavorite }) => {
   // The list view only has the slim summary shape (excerpt, no content/mood) —
   // fetch the full entry once the drawer is opened.
   const { data: fullEntry } = useQuery({
@@ -39,13 +39,14 @@ export const JournalDetailDrawer = ({ entry: entrySummary, isOpen, onClose, onDe
             <div className="h-16 border-b border-border-default flex items-center justify-between px-6 shrink-0 bg-surface-secondary/50 backdrop-blur-md">
               <span className="font-semibold text-text-muted uppercase tracking-wider text-xs">Reading Mode</span>
               <div className="flex items-center gap-2">
-                <button className={`p-2 rounded-lg transition-colors ${isFavorite ? 'text-pink-500 hover:bg-pink-50' : 'text-text-muted hover:bg-surface-primary hover:text-text-heading'}`}>
+                <button
+                  onClick={() => onToggleFavorite(entry.id, !isFavorite)}
+                  className={`p-2 rounded-lg transition-colors ${isFavorite ? 'text-pink-500 hover:bg-pink-50' : 'text-text-muted hover:bg-surface-primary hover:text-text-heading'}`}
+                  aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                >
                   <Heart size={18} className={isFavorite ? 'fill-pink-500' : ''} />
                 </button>
-                <button className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors">
-                  <Share size={18} />
-                </button>
-                <button 
+                <button
                   onClick={() => onEdit(entry)}
                   className="p-2 text-text-muted hover:text-text-heading rounded-lg hover:bg-surface-primary transition-colors"
                 >

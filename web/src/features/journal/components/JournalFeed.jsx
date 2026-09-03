@@ -4,7 +4,7 @@ import { JournalCard } from './JournalCard';
 import { EmptyState } from '../../../components/common/EmptyStates';
 import { DashboardSkeleton } from '../../../components/common/Skeletons';
 
-export const JournalFeed = ({ entries, isLoading, error, onClickEntry }) => {
+export const JournalFeed = ({ entries, isLoading, error, onClickEntry, onToggleFavorite }) => {
   if (isLoading) return <div className="grid grid-cols-1 md:grid-cols-2 gap-6"><DashboardSkeleton /><DashboardSkeleton /></div>;
   if (error) return <div className="p-8 rounded-2xl bg-red-50 border border-red-200 text-red-600">Failed to load journal entries. Please try again.</div>;
   if (!entries || entries.length === 0) return (
@@ -17,10 +17,11 @@ export const JournalFeed = ({ entries, isLoading, error, onClickEntry }) => {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <AnimatePresence>
         {entries.map(entry => (
-          <JournalCard 
-            key={entry.id} 
+          <JournalCard
+            key={entry.id}
             entry={entry}
             onClick={() => onClickEntry(entry)}
+            onToggleFavorite={onToggleFavorite}
           />
         ))}
       </AnimatePresence>

@@ -1,12 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Circle, Clock, Plus } from 'lucide-react';
 import { useTasks } from '../../../hooks/useTasks';
 import { WidgetSkeleton } from '../../../components/common/Skeletons';
 import { EmptyState } from '../../../components/common/EmptyStates';
+import Modal from '../../../components/common/Modal';
+import TaskForm from '../../../components/TaskForm';
 
 export const TasksWidget = () => {
   const { data: tasks, isLoading, error, updateTask } = useTasks();
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
 
   const handleToggle = (task) => {
     updateTask.mutate({ id: task.id, data: { status: task.status === 'completed' ? 'todo' : 'completed' } });
@@ -27,7 +30,11 @@ export const TasksWidget = () => {
         <h3 className="font-bold text-text-heading flex items-center gap-2">
           Tasks <span className="bg-surface-secondary text-text-muted px-2 py-0.5 rounded-full text-xs font-semibold">{pendingTasks.length}</span>
         </h3>
-        <button className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors">
+        <button
+          onClick={() => setIsCreateOpen(true)}
+          className="p-1.5 text-text-muted hover:text-text-heading hover:bg-surface-secondary rounded-md transition-colors"
+          aria-label="Add task"
+        >
           <Plus size={16} />
         </button>
       </div>
@@ -47,7 +54,7 @@ export const TasksWidget = () => {
               <div className="min-w-0 flex-1">
                 <p className="text-sm font-medium text-text-heading truncate">{task.title}</p>
                 <div className="flex items-center gap-2 mt-1">
-                  {task.priority === 'High' && (
+                  {task.priority === 'high' && (
                     <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-600 uppercase tracking-wider">High</span>
                   )}
                   {task.dueDate && (
@@ -61,6 +68,10 @@ export const TasksWidget = () => {
           ))
         )}
       </div>
+
+      <Modal isOpen={isCreateOpen} onClose={() => setIsCreateOpen(false)} title="Create Task">
+        <TaskForm onSuccess={() => setIsCreateOpen(false)} onClose={() => setIsCreateOpen(false)} defaultType="task" />
+      </Modal>
     </motion.div>
   );
 };

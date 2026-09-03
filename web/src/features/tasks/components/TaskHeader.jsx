@@ -1,9 +1,9 @@
 import React from 'react';
-import { Plus, Search, Filter, CheckCircle2, Clock } from 'lucide-react';
+import { Plus, Search, CheckCircle2, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export const TaskHeader = ({ tasks, onOpenCreate, onSearch }) => {
-  const completedToday = tasks?.filter(t => t.status === 'completed' && new Date(t.updatedAt || t.dueDate).toDateString() === new Date().toDateString()).length || 0;
+  const completedToday = tasks?.filter(t => t.status === 'completed' && t.completedAt && new Date(t.completedAt).toDateString() === new Date().toDateString()).length || 0;
   const overdueCount = tasks?.filter(t => t.status !== 'completed' && new Date(t.dueDate) < new Date()).length || 0;
   const total = tasks?.length || 0;
   const completionRate = total ? Math.round((tasks.filter(t => t.status === 'completed').length / total) * 100) : 0;
@@ -39,11 +39,7 @@ export const TaskHeader = ({ tasks, onOpenCreate, onSearch }) => {
           />
         </div>
         
-        <button className="p-2 bg-surface-primary border border-border-default text-text-muted hover:text-text-heading rounded-xl shadow-sm hover:shadow-md transition-all">
-          <Filter size={20} />
-        </button>
-        
-        <button 
+        <button
           onClick={onOpenCreate}
           className="flex items-center gap-2 px-4 py-2 bg-interactive-primary text-white font-semibold rounded-xl hover:bg-interactive-primary/90 transition-all shadow-sm hover:shadow-md"
         >

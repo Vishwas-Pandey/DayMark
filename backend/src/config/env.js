@@ -4,7 +4,11 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const envSchema = z.object({
-  PORT: z.string().default('8000').transform(Number),
+  // Render (and some other hosts) can leave PORT set to an empty string rather
+  // than unset — Number('') is 0, which zod's default() won't catch since the
+  // key isn't technically undefined. Treat blank as unset so the real port
+  // (injected by the host, or the local default) is used instead of 0.
+  PORT: z.preprocess((v) => (v === '' ? undefined : v), z.string().default('8000')).transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   MONGO_URI: z.string().url(),
   CORS_ORIGIN: z.string().url(),

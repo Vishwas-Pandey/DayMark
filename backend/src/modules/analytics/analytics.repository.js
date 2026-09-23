@@ -94,14 +94,15 @@ export const analyticsRepository = {
     ]);
   },
 
-  getHeatmapData: async (userId, start, end) => {
+  // Groups completions by calendar day in the viewer's timezone.
+  getHeatmapData: async (userId, start, end, timezone = 'UTC') => {
     return Task.aggregate([
       { $match: { userId, status: 'completed', completedAt: { $gte: start, $lte: end } } },
       { $group: {
-          _id: { year: { $year: '$completedAt' }, month: { $month: '$completedAt' }, day: { $dayOfMonth: '$completedAt' } },
+          _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt', timezone } },
           count: { $sum: 1 }
       } },
-      { $sort: { '_id.year': 1, '_id.month': 1, '_id.day': 1 } }
+      { $sort: { _id: 1 } }
     ]);
   },
 

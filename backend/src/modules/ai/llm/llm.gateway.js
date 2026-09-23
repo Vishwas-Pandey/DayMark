@@ -15,7 +15,7 @@ export const llmGateway = {
       logger.warn({ error: error.message, provider: provider.name }, 'Primary AI provider failed, falling back to mock');
       const fallback = providerManager.getProvider(PROVIDER_TYPES.MOCK);
       if (!fallback || fallback === provider) throw new AppError('AI Service unavailable', 503);
-      const result = await fallback.completion(prompt, options);
+      const result = await fallback.completion(prompt, { ...options, fallback: true });
       return { text: result.content, provider: result.provider };
     }
   },

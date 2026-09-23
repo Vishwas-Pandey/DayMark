@@ -3,6 +3,17 @@ import { ApiResponse } from '#common/responses/ApiResponse.js';
 import { toDashboardDTO, toHeatmapDTO, toSnapshotDTO } from './analytics.dto.js';
 import { asyncHandler } from '#common/utils/asyncHandler.js';
 
+// IANA timezone from the client (e.g. "Asia/Kolkata"), or UTC if missing/invalid.
+const validTimezone = (tz) => {
+  if (!tz) return 'UTC';
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: tz });
+    return tz;
+  } catch {
+    return 'UTC';
+  }
+};
+
 export const analyticsController = {
   getDashboard: asyncHandler(async (req, res) => {
     const start = req.query.startDate ? new Date(req.query.startDate) : null;
@@ -48,7 +59,7 @@ export const analyticsController = {
     const start = req.query.startDate ? new Date(req.query.startDate) : new Date(Date.now() - 365*24*60*60*1000);
     const end = req.query.endDate ? new Date(req.query.endDate) : new Date();
     
-    const heatmap = await analyticsService.getHeatmapData(req.user._id, start, end);
+    const heatmap = await analyticsService.getHeatmapData(req.user._id, start, end, validTimezone(req.query.timezone));
     res.status(200).json(new ApiResponse(200, toHeatmapDTO(heatmap), 'Heatmap data retrieved'));
   }),
   

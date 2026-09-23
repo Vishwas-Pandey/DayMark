@@ -2,6 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Grid } from 'lucide-react';
 import { analyticsApi } from '../../../api/analytics';
+import { localDateKey } from '../../../utils/localDate';
 
 const WEEKS = 12;
 const DAYS_SHOWN = WEEKS * 7;
@@ -20,7 +21,7 @@ export const AnalyticsHeatmaps = () => {
   const dayCells = [...Array(DAYS_SHOWN)].map((_, i) => {
     const date = new Date(start);
     date.setDate(start.getDate() + i);
-    return { date, count: countByDate.get(date.toISOString().slice(0, 10)) || 0 };
+    return { date, count: countByDate.get(localDateKey(date)) || 0 };
   });
   const maxCount = Math.max(1, ...dayCells.map((d) => d.count));
   const intensity = (count) => {

@@ -43,6 +43,8 @@ export const HabitCard = ({ habit, isCompleted, onToggle, onClick }) => {
         <button 
           onClick={(e) => { e.stopPropagation(); onToggle(habit); }}
           disabled={isPaused}
+          aria-label={isCompleted ? `Mark "${habit.title}" as not done today` : `Mark "${habit.title}" as done today`}
+          aria-pressed={isCompleted}
           className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-all ${
             isCompleted 
               ? 'bg-green-500 text-white shadow-md' 

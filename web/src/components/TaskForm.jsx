@@ -5,8 +5,13 @@ import { useHabits } from "../hooks/useHabits";
 import { useGoals } from "../hooks/useGoals";
 import { useCalendar } from "../hooks/useCalendar";
 
-const todayISO = () => new Date().toISOString().split("T")[0];
-const nowTimeStr = () => new Date().toTimeString().slice(0, 5);
+// Local calendar date (toISOString would give the UTC date, which is yesterday
+// for part of the day in timezones ahead of UTC such as IST).
+const todayISO = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+};
+const nowTimeStr = (addMinutes = 0) => new Date(Date.now() + addMinutes * 60000).toTimeString().slice(0, 5);
 
 const LABELS = {
   task: "Task",
@@ -30,7 +35,7 @@ const TaskForm = ({ onSuccess, onClose, defaultType = "task" }) => {
     unit: "%",
     startDate: todayISO(),
     startTime: nowTimeStr(),
-    endTime: nowTimeStr(),
+    endTime: nowTimeStr(60),
   });
 
   const mutation =
@@ -64,7 +69,8 @@ const TaskForm = ({ onSuccess, onClose, defaultType = "task" }) => {
     return {
       title,
       priority: formData.priority.toLowerCase(),
-      dueDate: new Date(formData.dueDate).toISOString(),
+      // Due at the end of the chosen local day, so a task due today isn't overdue immediately.
+      dueDate: new Date(`${formData.dueDate}T23:59:59`).toISOString(),
     };
   };
 

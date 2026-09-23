@@ -51,9 +51,10 @@ export const GoalHeader = ({ goals, onOpenCreate }) => {
         
         <button 
           onClick={onOpenCreate}
-          className="flex items-center justify-center w-12 h-12 rounded-xl bg-interactive-primary text-white shadow-sm hover:shadow-md hover:bg-interactive-primary/90 transition-all shrink-0"
+          className="flex items-center justify-center gap-2 h-12 px-5 rounded-xl bg-interactive-primary text-white text-sm font-semibold shadow-sm hover:shadow-md hover:bg-interactive-primary/90 transition-all shrink-0"
         >
-          <Plus size={24} />
+          <Plus size={20} />
+          <span>New goal</span>
         </button>
       </div>
     </div>

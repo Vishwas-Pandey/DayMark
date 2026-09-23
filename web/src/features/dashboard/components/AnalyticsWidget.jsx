@@ -6,6 +6,7 @@ import { BarChart2 } from 'lucide-react';
 import { useAnalytics } from '../../../hooks/useAnalytics';
 import { analyticsApi } from '../../../api/analytics';
 import { WidgetSkeleton } from '../../../components/common/Skeletons';
+import { localDateKey } from '../../../utils/localDate';
 
 const DAYS = 7;
 
@@ -31,7 +32,7 @@ export const AnalyticsWidget = () => {
   const dayCells = [...Array(DAYS)].map((_, i) => {
     const date = new Date(end);
     date.setDate(end.getDate() - (DAYS - 1 - i));
-    const key = date.toISOString().slice(0, 10);
+    const key = localDateKey(date);
     const count = heatmap?.find((h) => h.date === key)?.count || 0;
     return { date, count };
   });

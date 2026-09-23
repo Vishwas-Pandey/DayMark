@@ -29,6 +29,8 @@ describe('ai chat', () => {
     const res = await api().post('/api/v1/ai/chat').set(auth(token)).send({ message: 'What should I focus on today?' });
     expect(res.status).toBe(200);
     expect(res.body.data).toBeTruthy();
+    // With the mock provider the reply says AI is off instead of pretending to be a network error.
+    expect(JSON.stringify(res.body.data)).toMatch(/aren't enabled/);
 
     const list = await api().get('/api/v1/ai/conversations').set(auth(token));
     expect(list.status).toBe(200);

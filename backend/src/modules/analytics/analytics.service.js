@@ -23,11 +23,11 @@ export const analyticsService = {
     };
   },
   
-  getHeatmapData: async (userId, start, end) => {
-    const heatmap = await analyticsRepository.getHeatmapData(userId, start, end);
+  getHeatmapData: async (userId, start, end, timezone) => {
+    const heatmap = await analyticsRepository.getHeatmapData(userId, start, end, timezone);
     logger.info({ userId, action: 'HEATMAP_GENERATED' }, 'Heatmap data generated');
     return heatmap.map(item => ({
-      date: `${item._id.year}-${String(item._id.month).padStart(2, '0')}-${String(item._id.day).padStart(2, '0')}`,
+      date: item._id,
       count: item.count
     }));
   },

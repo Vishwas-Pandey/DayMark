@@ -11,7 +11,7 @@ const envSchema = z.object({
   PORT: z.preprocess((v) => (v === '' ? undefined : v), z.string().default('8000')).transform(Number),
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   MONGO_URI: z.string().url(),
-  CORS_ORIGIN: z.string().url(),
+  CORS_ORIGIN: z.string().default(''),
   JWT_SECRET: z.string(),
   JWT_REFRESH_SECRET: z.string(),
   JWT_EXPIRES_IN: z.string().default('15m'),

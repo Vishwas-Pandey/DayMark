@@ -21,3 +21,22 @@ describe('health and routing', () => {
     expect(Array.isArray(res.body.errors)).toBe(true);
   });
 });
+
+describe('cors', () => {
+  it('allows the production frontend origin with credentials', async () => {
+    const res = await api()
+      .options('/api/v1/auth/login')
+      .set('Origin', 'https://day-mark-five.vercel.app')
+      .set('Access-Control-Request-Method', 'POST');
+    expect(res.headers['access-control-allow-origin']).toBe('https://day-mark-five.vercel.app');
+    expect(res.headers['access-control-allow-credentials']).toBe('true');
+  });
+
+  it('does not allow an unknown origin', async () => {
+    const res = await api()
+      .options('/api/v1/auth/login')
+      .set('Origin', 'https://evil.example.com')
+      .set('Access-Control-Request-Method', 'POST');
+    expect(res.headers['access-control-allow-origin']).toBeUndefined();
+  });
+});

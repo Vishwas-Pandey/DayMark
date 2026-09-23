@@ -5,11 +5,15 @@ import { toUserResponse } from '#modules/users/user.dto.js';
 import { asyncHandler } from '#common/utils/asyncHandler.js';
 import { env } from '#config/env.js';
 
+// In production the frontend (vercel.app) and API (onrender.com) are on
+// different sites, so the refresh cookie must be SameSite=None; Secure.
+const isProd = env.NODE_ENV === 'production';
 const cookieOptions = {
   httpOnly: true,
-  secure: env.NODE_ENV === 'production',
-  sameSite: 'strict',
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+  secure: isProd,
+  sameSite: isProd ? 'none' : 'lax',
+  maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+  path: '/'
 };
 
 export const authController = {
@@ -19,14 +23,6 @@ export const authController = {
     req.body.userAgent = req.get('User-Agent') || 'unknown';
     
     const { user, accessToken, refreshToken } = await authService.register(req.body);
-    
-    const cookieOptions = {
-      httpOnly: true,
-      secure: env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      path: '/'
-    };
     
     res.cookie('refreshToken', refreshToken, cookieOptions);
     res.status(201).json(new ApiResponse(201, toAuthResponse(user, accessToken), 'Registration successful'));

@@ -1,4 +1,3 @@
-version: '3.8'
 services:
   frontend:
     build:
@@ -11,10 +10,16 @@ services:
     build:
       context: ./backend
     ports:
-      - "3000:3000"
+      - "8000:8000"
     environment:
       - NODE_ENV=production
-      - MONGODB_URI=mongodb://mongo:27017/daymark
+      - PORT=8000
+      - MONGO_URI=mongodb://mongo:27017/daymark
+      - CORS_ORIGIN=http://localhost
+      - JWT_SECRET=${JWT_SECRET:?set JWT_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET:?set JWT_REFRESH_SECRET}
+      - AI_PROVIDER=${AI_PROVIDER:-MOCK}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
     depends_on:
       - mongo
   mongo:

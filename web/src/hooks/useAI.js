@@ -11,18 +11,6 @@ export const useAI = () => {
     }
   });
 
-  const executeMutation = useMutation({
-    mutationFn: aiApi.execute
-  });
-
-  const previewMutation = useMutation({
-    mutationFn: aiApi.preview
-  });
-
-  const confirmMutation = useMutation({
-    mutationFn: aiApi.confirm
-  });
-
   const conversationsQuery = useQuery({
     queryKey: ['ai', 'conversations'],
     queryFn: () => aiApi.listConversations().then(res => res.data)
@@ -37,10 +25,7 @@ export const useAI = () => {
 
   return {
     chat: chatMutation.mutateAsync,
-    execute: executeMutation.mutateAsync,
-    preview: previewMutation.mutateAsync,
-    confirm: confirmMutation.mutateAsync,
-    isProcessing: chatMutation.isPending || executeMutation.isPending || previewMutation.isPending || confirmMutation.isPending,
+    isProcessing: chatMutation.isPending,
     // Resource-specific aliases used by the AI workspace page
     sendMessage: chatMutation,
     isGenerating: chatMutation.isPending,

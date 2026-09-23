@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { TESTIMONIALS, TRUST_STATS } from '../../landing/components/testimonials/TestimonialData';
-
-const featuredQuote = TESTIMONIALS[1];
-const activeUsers = TRUST_STATS[0];
+const HIGHLIGHTS = [
+  'Tasks, habits, goals and a daily journal in one place',
+  'Streaks and a heatmap built from your own history',
+  'An AI chat that can read your tasks and habits for context',
+];
 
 export const AuthBrandPanel = () => {
   const reduceMotion = useReducedMotion();
@@ -45,26 +46,14 @@ export const AuthBrandPanel = () => {
         transition={{ duration: 0.6, delay: 0.15, ease: 'easeOut' }}
         className="relative z-10 rounded-2xl border border-border-default bg-surface-primary/60 backdrop-blur-xl p-6 shadow-floating"
       >
-        <p className="text-sm text-text-body leading-relaxed">&ldquo;{featuredQuote.quote}&rdquo;</p>
-        <div className="mt-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src={featuredQuote.avatar}
-              alt=""
-              width={36}
-              height={36}
-              className="rounded-full border border-border-default"
-              loading="lazy"
-            />
-            <div>
-              <p className="text-sm font-medium text-text-heading">{featuredQuote.name}</p>
-              <p className="text-xs text-text-muted">{featuredQuote.occupation}</p>
-            </div>
-          </div>
-          <p className="text-xs text-text-muted">
-            <span className="text-text-heading font-semibold">{activeUsers.value.toLocaleString()}{activeUsers.suffix}</span> daily users
-          </p>
-        </div>
+        <ul className="space-y-3">
+          {HIGHLIGHTS.map((item) => (
+            <li key={item} className="flex items-start gap-3 text-sm text-text-body leading-relaxed">
+              <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-interactive-primary" />
+              {item}
+            </li>
+          ))}
+        </ul>
       </motion.div>
     </div>
   );

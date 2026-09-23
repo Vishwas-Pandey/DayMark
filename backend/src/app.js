@@ -37,15 +37,6 @@ if (process.env.NODE_ENV === 'production') {
   app.use('/api', limiter);
 }
 
-app.use((req, res, next) => {
-    console.log(
-        `[${new Date().toISOString()}]`,
-        req.method,
-        req.originalUrl
-    );
-    next();
-});
-
 // Context & Logging
 app.use(requestContextMiddleware);
 app.use(requestLogger);

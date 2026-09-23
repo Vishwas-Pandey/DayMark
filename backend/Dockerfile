@@ -1,13 +1,9 @@
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 WORKDIR /app
+ENV NODE_ENV=production
 COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-FROM node:20-alpine AS production
-WORKDIR /app
-COPY --from=builder /app/package*.json ./
-RUN npm ci --only=production
-COPY --from=builder /app/src ./src
-CMD ["npm", "start"]
+RUN npm ci --omit=dev --ignore-scripts
+COPY server.js ./
+COPY src ./src
+EXPOSE 8000
+CMD ["node", "src/server.js"]

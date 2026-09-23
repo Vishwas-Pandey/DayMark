@@ -4,7 +4,6 @@ import { ProductPreview } from '../features/landing/components/product-preview';
 import { Storytelling } from '../features/landing/components/storytelling';
 import { BentoSection } from '../features/landing/components/bento';
 import { AISection } from '../features/landing/components/ai';
-import { TestimonialsSection } from '../features/landing/components/testimonials';
 import { CTASection } from '../features/landing/components/cta';
 import { FooterSection } from '../features/landing/components/footer';
 
@@ -21,7 +20,6 @@ export const Landing = () => {
       </div>
       
       <div className="pt-6 pb-12 sm:pt-8 sm:pb-16 relative z-10" id="pricing">
-        <TestimonialsSection />
       </div>
       
       <CTASection />

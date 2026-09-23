@@ -1,29 +1,39 @@
-name: DayMark CI/CD
+name: DayMark CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
-  test-backend:
+  backend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: cd backend && npm ci
-      - run: cd backend && npm run test
+          cache: npm
+          cache-dependency-path: backend/package-lock.json
+      - run: npm ci
+      # API tests run against an in-memory MongoDB (mongodb-memory-server), no external services needed.
+      - run: npm test
 
-  test-frontend:
+  web:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - run: cd web && npm ci
-      - run: cd web && npm run test
-      - run: cd web && npm run build
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm run build

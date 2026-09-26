@@ -27,7 +27,10 @@ const ChartCard = ({ title, icon: Icon, children, isEmpty, emptyMessage }) => (
       <div className="p-1.5 bg-surface-secondary text-text-muted rounded-lg"><Icon size={16} /></div>
       <h3 className="font-bold text-text-heading text-sm">{title}</h3>
     </div>
-    <div className="flex-1 h-64 w-full">
+    {/* Plain h-64, no flex-1: as a flex item in ChartCard's column layout, flex-1's
+        flex-basis: 0% would win over height and collapse this to ~0px, which silently
+        breaks recharts' ResponsiveContainer (it measures 0 and renders no SVG at all). */}
+    <div className="h-64 w-full shrink-0">
       {isEmpty ? (
         <div className="h-full w-full flex items-center justify-center text-sm text-text-muted">{emptyMessage}</div>
       ) : (

@@ -106,6 +106,29 @@ export const analyticsRepository = {
     ]);
   },
 
+  // Day-bucketed series for the trend charts, in UTC (matches other repository methods here).
+  getTrendData: async (userId, start, end) => {
+    const [taskCompletions, habitCompletions, journalProductivity] = await Promise.all([
+      Task.aggregate([
+        { $match: { userId, status: 'completed', completedAt: { $gte: start, $lte: end } } },
+        { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } }
+      ]),
+      HabitCompletion.aggregate([
+        { $match: { userId, completedAt: { $gte: start, $lte: end } } },
+        { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$completedAt' } }, count: { $sum: 1 } } },
+        { $sort: { _id: 1 } }
+      ]),
+      JournalEntry.aggregate([
+        { $match: { userId, deletedAt: null, createdAt: { $gte: start, $lte: end }, productivity: { $ne: null } } },
+        { $group: { _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } }, avgProductivity: { $avg: '$productivity' } } },
+        { $sort: { _id: 1 } }
+      ])
+    ]);
+
+    return { taskCompletions, habitCompletions, journalProductivity };
+  },
+
   getLatestSnapshot: async (userId, type) => {
     const query = { userId };
     if (type) query[type] = true;

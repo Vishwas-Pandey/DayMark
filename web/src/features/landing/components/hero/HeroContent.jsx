@@ -94,39 +94,28 @@ const SecondaryCTA = () => {
   );
 };
 
-import { useState, useEffect } from 'react';
-const Counter = ({ from, to, duration, format }) => {
-  const [count, setCount] = useState(from);
-  useEffect(() => {
-    let start = null;
-    const step = (timestamp) => {
-      if (!start) start = timestamp;
-      const progress = Math.min((timestamp - start) / duration, 1);
-      const current = Math.floor(progress * (to - from) + from);
-      setCount(current);
-      if (progress < 1) window.requestAnimationFrame(step);
-    };
-    const timer = setTimeout(() => window.requestAnimationFrame(step), 2500); // Wait for sequence
-    return () => clearTimeout(timer);
-  }, [from, to, duration]);
-  return <span>{format ? format(count) : count}</span>;
-};
-
 const SocialProof = () => (
-  <motion.div 
+  <motion.div
     className="flex items-center gap-8 border-t border-border-subtle pt-8 w-full"
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 1, delay: 2.2 }}
   >
     <div className="flex flex-col">
-      <span className="text-2xl font-bold text-text-heading"><Counter from={0} to={10} duration={2000} format={(n) => `${n}K+`} /></span>
-      <span className="text-xs text-text-muted font-medium uppercase tracking-wider">Active Streaks</span>
+      <span className="text-2xl font-bold text-text-heading">6</span>
+      <span className="text-xs text-text-muted font-medium uppercase tracking-wider">Core Modules</span>
     </div>
     <div className="w-[1px] h-8 bg-border-subtle"></div>
     <div className="flex flex-col">
-      <span className="text-2xl font-bold text-text-heading"><Counter from={0} to={50} duration={2000} format={(n) => `${n}K+`} /></span>
-      <span className="text-xs text-text-muted font-medium uppercase tracking-wider">Goals Reached</span>
+      <a
+        href="https://github.com/Vishwas-Pandey/DayMark"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-2xl font-bold text-text-heading hover:text-interactive-primary transition-colors"
+      >
+        Open Source
+      </a>
+      <span className="text-xs text-text-muted font-medium uppercase tracking-wider">View on GitHub</span>
     </div>
   </motion.div>
 );

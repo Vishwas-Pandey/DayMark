@@ -12,7 +12,7 @@ import { EmptyState } from '../components/common/EmptyStates';
 
 export const Analytics = () => {
   const [timeRange, setTimeRange] = useState('this-month');
-  const { data, isLoading, error, refetch, isRefetching } = useAnalytics(timeRange);
+  const { data, trends, isLoading, error, refetch, isRefetching } = useAnalytics(timeRange);
 
   return (
     <div className="w-full max-w-6xl mx-auto pb-24 min-h-full">
@@ -49,7 +49,7 @@ export const Analytics = () => {
           </ErrorBoundary>
           
           <ErrorBoundary>
-            <AnalyticsCharts data={data} />
+            <AnalyticsCharts data={data} trends={trends} />
           </ErrorBoundary>
 
           <ErrorBoundary>

@@ -44,12 +44,45 @@ export const analyticsService = {
     return snapshot;
   },
 
+  // Daily series for the trend charts. Defaults to the last 14 days when no
+  // range is given, since the time-range selector on the Analytics page isn't
+  // wired to this endpoint (matches how the heatmap already ignores it too).
   getTrends: async (userId, start, end) => {
+    const rangeEnd = end || new Date();
+    const rangeStart = start || new Date(rangeEnd.getTime() - 13 * 24 * 60 * 60 * 1000);
+
+    const { taskCompletions, habitCompletions, journalProductivity } =
+      await analyticsRepository.getTrendData(userId, rangeStart, rangeEnd);
+
     logger.info({ userId, action: 'TREND_GENERATED' }, 'Trend data generated');
-    // Placeholder for actual trend calculations
-    return { trend: 'upward', velocity: 1.5 };
+
+    return {
+      range: { start: rangeStart, end: rangeEnd },
+      taskCompletions: _fillDailySeries(taskCompletions, rangeStart, rangeEnd, 'count', 0),
+      habitCompletions: _fillDailySeries(habitCompletions, rangeStart, rangeEnd, 'count', 0),
+      journalProductivity: _fillDailySeries(journalProductivity, rangeStart, rangeEnd, 'avgProductivity', null)
+    };
   }
 };
+
+// Turns a sparse Mongo $group result (keyed by "_id": "YYYY-MM-DD") into a
+// dense day-by-day array covering [start, end], so charts don't skip days
+// with no activity.
+function _fillDailySeries(rows, start, end, valueKey, emptyValue) {
+  const byDate = new Map(rows.map((r) => [r._id, r[valueKey]]));
+  const days = [];
+  const cursor = new Date(start);
+  cursor.setUTCHours(0, 0, 0, 0);
+  const last = new Date(end);
+  last.setUTCHours(0, 0, 0, 0);
+
+  while (cursor <= last) {
+    const key = cursor.toISOString().slice(0, 10);
+    days.push({ date: key, value: byDate.has(key) ? byDate.get(key) : emptyValue });
+    cursor.setUTCDate(cursor.getUTCDate() + 1);
+  }
+  return days;
+}
 
 // --- Internal Formatters ---
 function _formatTaskMetrics(tasks) {

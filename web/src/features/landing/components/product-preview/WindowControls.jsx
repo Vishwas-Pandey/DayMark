@@ -7,7 +7,7 @@ export const WindowControls = () => (
       <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
       <div className="w-3 h-3 rounded-full bg-green-500/80" />
     </div>
-    <div className="text-xs font-medium text-text-muted">app.daymark.ai</div>
+    <div className="text-xs font-medium text-text-muted">day-mark-five.vercel.app</div>
     <div className="w-12" /> {/* Spacer for centering */}
   </div>
 );

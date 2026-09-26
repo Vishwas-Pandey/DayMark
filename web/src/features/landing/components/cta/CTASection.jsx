@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { CTAStats } from './CTAStats';
 import { FloatingWidgets } from './FloatingWidgets';
 
 export const CTASection = () => {
@@ -35,9 +34,7 @@ export const CTASection = () => {
       {/* Main Content */}
       <div className="relative z-10 w-full max-w-5xl mx-auto flex flex-col items-center px-6">
         
-        <CTAStats />
-
-        <motion.div 
+        <motion.div
           className="text-center max-w-3xl mt-12 mb-12"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}

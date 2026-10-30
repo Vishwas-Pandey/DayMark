@@ -4,6 +4,17 @@ import { TaskWidget, HabitWidget, ScoreWidget, JournalWidget } from './Dashboard
 import { AICommandCenter } from './ai/AICommandCenter';
 import { useDemoStore } from '../store/useDemoStore';
 import { motion, AnimatePresence } from 'framer-motion';
+import { TasksView, HabitsView, CalendarView, JournalView, GoalsView, AnalyticsView, SettingsView } from './DemoViews';
+
+const VIEWS = {
+  Tasks: TasksView,
+  Habits: HabitsView,
+  Calendar: CalendarView,
+  Journal: JournalView,
+  Goals: GoalsView,
+  Analytics: AnalyticsView,
+  Settings: SettingsView,
+};
 
 const DashboardHome = () => (
   <motion.div 
@@ -25,17 +36,6 @@ const DashboardHome = () => (
   </motion.div>
 );
 
-const PlaceholderView = ({ title }) => (
-  <motion.div 
-    initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-    className="flex flex-col items-center justify-center h-96 text-text-muted"
-  >
-    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" className="mb-4 opacity-50"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg>
-    <h2 className="text-xl font-medium">{title}</h2>
-    <p className="text-sm mt-2 opacity-70">This feature is in development.</p>
-  </motion.div>
-);
-
 export const DemoDashboard = () => {
   const activeTab = useDemoStore(state => state.activeTab);
 
@@ -44,7 +44,7 @@ export const DemoDashboard = () => {
       <AnimatePresence mode="wait">
         {activeTab === 'Dashboard' && <DashboardHome key="dashboard" />}
         {activeTab === 'AI Coach' && <AICommandCenter key="ai" />}
-        {activeTab !== 'Dashboard' && activeTab !== 'AI Coach' && <PlaceholderView key="placeholder" title={activeTab} />}
+        {VIEWS[activeTab] && React.createElement(VIEWS[activeTab], { key: activeTab })}
       </AnimatePresence>
     </DemoDashboardLayout>
   );

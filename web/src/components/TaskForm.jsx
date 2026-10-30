@@ -194,10 +194,16 @@ const TaskForm = ({ onSuccess, onClose, defaultType = "task" }) => {
       <button
         type="submit"
         disabled={loading || !formData.title.trim()}
-        className="w-full bg-interactive-primary text-white font-bold py-3.5 rounded-xl hover:bg-interactive-primary/90 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
+        aria-busy={loading}
+        title={!formData.title.trim() ? 'Enter a title to continue' : undefined}
+        className="w-full flex items-center justify-center gap-2 bg-interactive-primary text-white font-bold py-3.5 rounded-xl hover:bg-interactive-primary/90 active:scale-95 transition-all disabled:opacity-60 disabled:cursor-not-allowed mt-2"
       >
+        {loading && <span aria-hidden="true" className="h-4 w-4 rounded-full border-2 border-white/40 border-t-white animate-spin motion-reduce:animate-none" />}
         {loading ? "Saving..." : `Create ${LABELS[defaultType]}`}
       </button>
+      {!loading && !formData.title.trim() && (
+        <p className="text-center text-xs text-text-muted mt-2">Enter a title to continue.</p>
+      )}
     </form>
   );
 };

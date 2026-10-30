@@ -2,6 +2,8 @@ import React from 'react';
 import { motion } from 'framer-motion';
 
 export const AIBriefingCard = () => {
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? 'Good Morning' : hour < 17 ? 'Good Afternoon' : 'Good Evening';
   return (
     <motion.div 
       initial={{ opacity: 0, y: 20 }}
@@ -17,7 +19,7 @@ export const AIBriefingCard = () => {
       
       <div className="space-y-4 relative z-10">
         <p className="text-sm text-text-muted leading-relaxed">
-          <strong className="text-text-heading font-semibold">Good Morning Vishwas.</strong><br/>
+          <strong className="text-text-heading font-semibold">{greeting} Alex.</strong><br/>
           You slept 7h 42m. Your productivity is expected to peak between <span className="text-interactive-primary">9:10</span> and <span className="text-interactive-primary">11:20</span>.
         </p>
         <p className="text-sm text-text-muted leading-relaxed">

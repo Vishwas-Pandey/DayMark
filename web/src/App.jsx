@@ -1,5 +1,5 @@
 import React, { Suspense, lazy } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 import { DashboardSkeleton } from "./components/common/Skeletons";
 import { OfflineBanner } from "./components/common/ErrorStates";
@@ -19,6 +19,7 @@ import { LoaderProvider, LoaderPortal, LoaderTransition } from "./features/landi
 // Pages
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
+import NotFound from "./pages/NotFound";
 import { DemoPage } from "./pages/DemoPage";
 
 // Lazy Loaded Protected Pages
@@ -66,10 +67,10 @@ const AppRoutes = () => {
             <Route path="/analytics" element={<Analytics />} />
             <Route path="/ai" element={<AI />} />
             <Route path="/profile" element={<Profile />} />
-
-            {/* Catch-all for logged in users */}
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
           </Route>
+
+          {/* Anything else (signed in or not) gets a real 404 page */}
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </>

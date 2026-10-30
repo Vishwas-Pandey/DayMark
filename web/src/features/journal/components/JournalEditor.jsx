@@ -81,6 +81,8 @@ export const JournalEditor = ({ isOpen, onClose, entry, onSave }) => {
                 type="button"
                 onClick={handleSubmit}
                 disabled={isSaving || !form.content.trim()}
+                aria-busy={isSaving}
+                title={!form.content.trim() ? 'Write something to save' : undefined}
                 className="flex items-center gap-2 px-4 py-1.5 bg-interactive-primary text-white font-semibold rounded-lg hover:bg-interactive-primary/90 transition-all shadow-sm disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <Save size={16} /> {isSaving ? 'Saving...' : 'Save'}
